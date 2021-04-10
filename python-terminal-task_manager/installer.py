@@ -42,6 +42,11 @@ else:
             import requests
         except ImportError:
             os.system("pip install requests")
+        try:
+            import pyAesCrypt 
+        except ImportError:
+            input("pip install pyAesCrypt ")
+            exit()
         
         print("i've seen enough i'm satisfied")
         input("success")

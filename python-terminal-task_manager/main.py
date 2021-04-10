@@ -46,6 +46,10 @@ try:
 except ImportError:
     input("miss pyAesCrypt lib run first installer.py")
     exit()
+try:
+    import requests
+except ImportError:
+    input("miss request lib run first installer.py")
 
 
 from getpass import getpass

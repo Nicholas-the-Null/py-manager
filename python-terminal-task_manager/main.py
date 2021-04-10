@@ -42,12 +42,13 @@ except ImportError:
     input("miss tqm lib run first installer.py")
     exit()
 try:
-    import requests
+    import pyAesCrypt 
 except ImportError:
-    input("miss request lib run first installer.py")
+    input("miss pyAesCrypt lib run first installer.py")
     exit()
 
 
+from getpass import getpass
 import random ,string
 
 
@@ -71,6 +72,9 @@ console.print(table)
 
 
 while True:
+    
+
+        
     command=console.input("[green]"+str(os.getcwd())+"[/]>").split()
     history.append(" ".join(command))
 
@@ -642,13 +646,70 @@ while True:
         command.pop(0)
         if len(command)!=0:
             if os.path.exists(command[0]):
-                pass
+                file=r''+command[0]
+                command.pop(0)
+                if command[0]=="key":
+                    enc=main.asset.secure.cripta.encrypt(file)
+                    print(enc)
+                    main.asset.secure.cripta.Delete_File(file)
+                    os.remove(file)
+                    if Confirm.ask("Do you want save password?"):
+                        with open("key-"+file+".key", "wb") as key_file:key_file.write(enc)
+                    
+                elif command[0]=="password":
+                    bufferSize = 1024 * 1024
+                    password=getpass("give me the password ")
+                    with open(file, "rb") as fIn:
+                        with open(file+"aes", "wb") as fOut:
+                            pyAesCrypt.encryptStream(fIn, fOut, password, bufferSize)
+                    main.asset.secure.cripta.Delete_File(file)
+                    os.remove(file)
+                    
+                else:
+                    console.print("[red]your parma are wrong "+"[/]")
+                
             else:
                 console.print("[red]error path not found "+"[/]")
 
 
         else:
             console.print("[red]error no parma in input "+"[/]")
+        
+
+    elif command[0]=="echo":
+        command.pop(0)
+        out=""
+        out_format="monitor"
+        save_number=0
+        for number,under_string in enumerate(command):
+            if under_string in [">",">>"]:
+                print(under_string)
+                save_number=number
+                out_format="file"
+                break
+            out+=under_string+" "
+        if out_format=="monitor":
+            print(out)
+        else:
+
+            if len(command)<save_number+2:
+                console.print("[red]error miss parma "+"[/]")
+            else:
+                print(command[save_number])
+                print(command[save_number+1])
+                try:
+                    if command[save_number]==">":
+                        with open(command[save_number+1],'w+') as file:
+                            file.write(out)
+                    else:
+                        with open(command[save_number+1],'a') as file:
+                            file.write("\n"+out)
+                except:
+                    console.print("[red]error invalid file name "+"[/]")
+
+
+
+
 
     
     

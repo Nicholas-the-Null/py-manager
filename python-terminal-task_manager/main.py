@@ -29,11 +29,6 @@ except ImportError:
     input("you miss some file please run installer.py with this code 1789")
 import sys
 import time
-try:
-    import win32api
-except ImportError:
-    input("miss winapi lib please run installer.py")
-    exit()
 import shutil
 import re
 try:
@@ -53,25 +48,40 @@ except ImportError:
     input("miss request lib run first installer.py")
 
 
-from getpass import getpass
+from getpass import getpass,getuser
 import random ,string
 from datetime import datetime
+import urllib.request, json
 
-
+with urllib.request.urlopen("https://nicholas-the-null.github.io/py_manager_website/stats.json") as url:data = json.loads(url.read().decode())
 
 console = Console()
 history=[]
+primitive_path=r'C:\\Users\\'+str(getuser())
+
+def GetShortPathName(path):
+    if os.getcwd in [r"C:\\Users","C:",primitive_path]:
+        path=path
+    else:
+        path=path[len(primitive_path)-1:]
+        return path
 
 
 table = Table(title="info")
 table.add_column("time",style="magenta")
 table.add_column("os",style="green",no_wrap=True)
 table.add_column("version",style="purple",no_wrap=True)
-table.add_column("sha256",style="#A52A2A",no_wrap=True)
-table.add_column("update",style="cyan",no_wrap=True)
+table.add_column("sha256",style="green",no_wrap=True)
+
+if data.get("sha256")!=main.asset.secure.file_sha256.File_calcolatore_sha256(sys.argv[0]):
+    table.add_column("update",style="red",no_wrap=True)
+    update="True"
+else:
+    table.add_column("update",style="False",no_wrap=True)
+    update="True"
 
 table.add_row(str(datetime.now()),str(platform.uname().system),"1.0",
-main.asset.secure.file_sha256.File_calcolatore_sha256(sys.argv[0]),"False")
+main.asset.secure.file_sha256.File_calcolatore_sha256(sys.argv[0]),update)
 
 console.print(table)
 
@@ -230,7 +240,7 @@ while True:
                 if len(command)==2 and (command==["-a","-l"] or command==["-l","-a"]):
                     table=Table(title="file")
                     table.add_column("#", style="magenta",)
-                    table.add_column("name", style="red",no_wrap=True)
+                    table.add_column("name", style="red")
                     table.add_column("is_dir",style="green")
                     table.add_column("size",style="blue")
                     table.add_column("creation",style="cyan") 
@@ -248,7 +258,7 @@ while True:
                                 size=str(round(os.path.getsize(nome)/(1024*1024),3))
                                 read=str(os.access(nome,os.R_OK))[0]
                                 write=str(os.access(nome,os.W_OK))[0]
-                                table.add_row(str(numero),str(win32api.GetShortPathName(path)),is_dir,size,tempo,read,write)
+                                table.add_row(str(numero),str(GetShortPathName(path)),is_dir,size,tempo,read,write)
                                 numero+=1
                             except Exception as e:
                                 print(str(e))
@@ -259,7 +269,7 @@ while True:
                 elif command[0]=="-l":
                     table=Table(title="file")
                     table.add_column("#", style="magenta")
-                    table.add_column("name", style="red",no_wrap=True)
+                    table.add_column("name", style="red")
                     table.add_column("is_dir", style="green")
                     table.add_column("size",style="blue")
                     table.add_column("creation",style="cyan") 
@@ -287,7 +297,7 @@ while True:
 
                 elif command[0]=="-a":
                     table=Table(title="file")
-                    table.add_column("nome",style="magenta",no_wrap=True)
+                    table.add_column("nome",style="magenta")
                     for path, subdirs, files in os.walk(directory):
                         for element in files:
                             table.add_row(os.path.join(path, element))
@@ -295,7 +305,12 @@ while True:
 
                 else:
                     console.print(f"[red]error parma are wrong "  +"[/]")
-
+            else:
+                table=Table(title="file")
+                table.add_column("name",style="magenta")
+                for x in os.listdir(directory):
+                    table.add_row(x)
+                console.print(table)
         else:
             table=Table(title="file")
             table.add_column("name",style="magenta")

@@ -46,6 +46,7 @@ try:
 except ImportError:
     input("miss pyAesCrypt lib run first installer.py")
     exit()
+
 try:
     import requests
 except ImportError:
@@ -54,6 +55,7 @@ except ImportError:
 
 from getpass import getpass
 import random ,string
+from datetime import datetime
 
 
 
@@ -75,6 +77,21 @@ console.print(table)
 
 
 
+
+
+console.print("""[green] 
+  _____       __  __                                   
+ |  __ \     |  \/  |                                  
+ | |__) |   _| \  / | __ _ _ __   __ _  __ _  ___ _ __ 
+ |  ___/ | | | |\/| |/ _` | '_ \ / _` |/ _` |/ _ \ '__|
+ | |   | |_| | |  | | (_| | | | | (_| | (_| |  __/ |   
+ |_|    \__, |_|  |_|\__,_|_| |_|\__,_|\__, |\___|_|   
+         __/ |                          __/ |          
+        |___/                          |___/           
+""" +"[/]")
+
+print("")
+
 while True:
     
 
@@ -88,6 +105,7 @@ while True:
         table.add_column("command",style="green",no_wrap=True)
         for numero,nome in enumerate(history):
             table.add_row(str(numero),str(nome))
+        
         console.print(table)
 
     elif command[0].lower() in ["cd","changedirectory","chd"]: #change dir
@@ -203,163 +221,89 @@ while True:
     elif command[0].lower() in ["ls","listdir","lsdir"]: #ls command print all file in a dir -l for long description -a for include all subdir and his file
         command.pop(0)#parma
         if not len(command)==0:
-            if os.path.exists(command[0]) is True:
-                if os.path.isdir(command[0]):
-                    if len(command)==1:
-                        table=Table(title="file")
-                        table.add_column("name",style="magenta",no_wrap=True)
-                        for element in os.listdir(command[0]):
-                            table.add_row(element)
-                        console.print(table)
-                        
-                    elif len(command)==2:
-                        if command[1]=="-l":
-                            table=Table(title="file")
-                            table.add_column("#", style="magenta", no_wrap=True)
-                            table.add_column("name", style="red",no_wrap=True)
-                            table.add_column("is_dir",no_wrap=True, style="green")
-                            table.add_column("size",style="blue",no_wrap=True)
-                            table.add_column("creation",style="cyan",no_wrap=True) 
-                            table.add_column("read",style="yellow",no_wrap=True)
-                            table.add_column("write",style="#008B8B",no_wrap=True)
-                            for numero,nome in enumerate(os.listdir(command[0])):
-                                try:
-                                    nome1=nome
-                                    
-                                    nome=r''+command[0]+"\\"+nome1
-                                    table.add_row(str(numero),nome1,str(os.path.isdir(nome))
-                                    ,str(round(os.path.getsize(nome)/(1024*1024),3))
-                                    ,str(time.ctime(os.path.getctime(nome)))
-                                    ,str(os.access(nome,os.R_OK)),
-                                    str(os.access(nome,os.W_OK)))
-                                    
-                                except:
-                                    continue
-                            console.print(table)
-                        elif command[1]=="-a":
-                            table=Table(title="file")
-                            table.add_column("nome",style="magenta",no_wrap=True)
-                            for path, subdirs, files in os.walk(command[0]):
-                                for element in files:
-                                    table.add_row(os.path.join(path, element))
-                            console.print(table)
-
-                        else:
-                            console.print("[red]parma are wrong"+"[/]")
-
-                    else:
-                        if (command==[command[0],"-l","-a"] or command==[command[0],"-a","-l"]):
-                            table=Table(title="file")
-                            table.add_column("#", style="magenta", no_wrap=True)
-                            table.add_column("path", style="red",no_wrap=True)
-                            table.add_column("is_dir",no_wrap=True, style="green")
-                            table.add_column("size",style="blue",no_wrap=True)
-                            table.add_column("creation",style="cyan",no_wrap=True) 
-                            table.add_column("read",style="yellow",no_wrap=True)
-                            table.add_column("write",style="#008B8B",no_wrap=True)
-                            numero=0
-                            for path, subdirs, files in os.walk(command[0]):
-                                    for element in files:
-                                        nome=os.path.join(path, element)
-                                
-                                        try:
-                                            table.add_row(str(2)
-                                            ,str(win32api.GetShortPathName(path))
-                                            ,str(os.path.isdir(nome))
-                                            ,str(round(os.path.getsize(nome)/(1024*1024),3))
-                                        ,str(time.ctime(os.path.getctime(nome)))
-                                        ,str(os.access(nome,os.R_OK)),
-                                        str(os.access(nome,os.W_OK)))
-                                        
-                                        except Exception as e:
-                                            print(str(e))
-                                            continue
-                                        numero+=1
-                            console.print(table)
-                        else:
-                            console.print("[red]parma are wrong"+"[/]")
-
-                else:
-                    console.print("[red]is not a dir"+"[/]")
-            
+            if os.path.exists(command[0]):
+                directory=command[0]
+                command.pop(0)
             else:
-
-                if len(command)==1:
-                   
-                    if command[0]=="-l":
-                        table=Table(title="file")
-                        table.add_column("#", style="magenta", no_wrap=True)
-                        table.add_column("name", style="red",no_wrap=True)
-                        table.add_column("is_dir",no_wrap=True, style="green")
-                        table.add_column("size",style="blue",no_wrap=True)
-                        table.add_column("creation",style="cyan",no_wrap=True) 
-                        table.add_column("read",style="yellow",no_wrap=True)
-                        table.add_column("write",style="#008B8B",no_wrap=True)
-                        for numero,nome in enumerate(os.listdir()):
-                            try:
-                                table.add_row(str(numero),nome,str(os.path.isdir(nome))
-                                ,str(round(os.path.getsize(nome)/(1024*1024),3))
-                                ,str(time.ctime(os.path.getctime(nome)))
-                                ,str(os.access(nome,os.R_OK)),
-                                str(os.access(nome,os.W_OK)))
-                                
-                            except:
-                                continue
-                        console.print(table)
-
-                    elif command[0]=="-a":
-                        table=Table(title="file")
-                        table.add_column("name",style="magenta",no_wrap=True)
-                        for path, subdirs, files in os.walk(os.getcwd()):
-                            for element in files:
-                                table.add_row(os.path.join(path, element))
-                        console.print(table)
-
-                    else:
-                        console.print("[red]is not a exists dir or parma"+"[/]")
-                    
-                
-
-                elif len(command)==2 and (command==["-l","-a"] or command==["-a","-l"]) :
+                directory=os.getcwd()
+            if not len(command)==0:
+                if len(command)==2 and (command==["-a","-l"] or command==["-l","-a"]):
                     table=Table(title="file")
-                    table.add_column("#", style="magenta", no_wrap=True)
-                    table.add_column("path", style="red",no_wrap=True)
-                    table.add_column("is_dir",no_wrap=True, style="green")
-                    table.add_column("size",style="blue",no_wrap=True)
-                    table.add_column("creation",style="cyan",no_wrap=True) 
-                    table.add_column("read",style="yellow",no_wrap=True)
-                    table.add_column("write",style="#008B8B",no_wrap=True)
+                    table.add_column("#", style="magenta",)
+                    table.add_column("name", style="red",no_wrap=True)
+                    table.add_column("is_dir",style="green")
+                    table.add_column("size",style="blue")
+                    table.add_column("creation",style="cyan") 
+                    table.add_column("read",style="yellow")
+                    table.add_column("write",style="#008B8B")
                     numero=0
-                    for path, subdirs, files in os.walk(os.getcwd()):
-                            for element in files:
-                                nome=os.path.join(path, element)
-
-                                
-                                try:
-                                    table.add_row(str(2)
-                                    ,str(win32api.GetShortPathName(path))
-                                    ,str(os.path.isdir(nome))
-                                    ,str(round(os.path.getsize(nome)/(1024*1024),3))
-                                ,str(time.ctime(os.path.getctime(nome)))
-                                ,str(os.access(nome,os.R_OK)),
-                                str(os.access(nome,os.W_OK)))
-                                
-                                except Exception as e:
-                                    print(str(e))
-                                    continue
+                    for path, subdirs, files in os.walk(directory):
+                        for element in files:
+                            nome=os.path.join(path, element)
+                            try:
+                                tempo=datetime.fromtimestamp(os.path.getctime(nome))
+                                tempo=tempo.strftime("%d:%m:%y")
+                                is_dir=str(os.path.isdir(nome))
+                                is_dir=is_dir[0]
+                                size=str(round(os.path.getsize(nome)/(1024*1024),3))
+                                read=str(os.access(nome,os.R_OK))[0]
+                                write=str(os.access(nome,os.W_OK))[0]
+                                table.add_row(str(numero),str(win32api.GetShortPathName(path)),is_dir,size,tempo,read,write)
                                 numero+=1
+                            except Exception as e:
+                                print(str(e))
+                                continue
                     console.print(table)
+
+
+                elif command[0]=="-l":
+                    table=Table(title="file")
+                    table.add_column("#", style="magenta")
+                    table.add_column("name", style="red",no_wrap=True)
+                    table.add_column("is_dir", style="green")
+                    table.add_column("size",style="blue")
+                    table.add_column("creation",style="cyan") 
+                    table.add_column("read",style="yellow")
+                    table.add_column("write",style="#008B8B")
+                    for numero,nome in enumerate(os.listdir(directory)):
+                        try:
+                            nome1=nome
+                            nome=r''+directory+"\\"+nome
+                            tempo=datetime.fromtimestamp(os.path.getctime(nome))
+                            tempo=tempo.strftime("%d:%m:%y")
+                            is_dir=str(os.path.isdir(nome))
+                            is_dir=is_dir[0]
+                            size=str(round(os.path.getsize(nome)/(1024*1024),3))
+                            read=str(os.access(nome,os.R_OK))[0]
+                            write=str(os.access(nome,os.W_OK))[0]
+
+                            table.add_row(str(numero),nome1,is_dir,size,tempo,read,write)
+                        except Exception as e:
+                            print(str(e))
+                            continue
+                    console.print(table)
+
+
+
+                elif command[0]=="-a":
+                    table=Table(title="file")
+                    table.add_column("nome",style="magenta",no_wrap=True)
+                    for path, subdirs, files in os.walk(directory):
+                        for element in files:
+                            table.add_row(os.path.join(path, element))
+                    console.print(table)
+
                 else:
-                    console.print("[red]parma are wrong"+"[/]")
-                    
+                    console.print(f"[red]error parma are wrong "  +"[/]")
 
         else:
             table=Table(title="file")
-            table.add_column("name",style="magenta",no_wrap=True)
-            for element in os.listdir():
-                table.add_row(element)
+            table.add_column("name",style="magenta")
+            for x in os.listdir():
+                table.add_row(x)
             console.print(table)
-    
+
+
 
     elif command[0].lower() in ["cp","copy"]: #copy file in another dir
         command.pop(0)
@@ -686,11 +630,23 @@ while True:
         out_format="monitor"
         save_number=0
         for number,under_string in enumerate(command):
+            
             if under_string in [">",">>"]:
-                print(under_string)
                 save_number=number
                 out_format="file"
                 break
+            if under_string[:5]=="date:":
+                formatto=under_string[5:]
+                formatto=formatto.replace("?"," ")
+                if formatto in [None,""," "]:under_string=str(datetime.now())
+                try:
+                    under_string=datetime.now()
+                    under_string=str(under_string.strftime(formatto))
+                except Exception as e:
+                    print(e)
+                    under_string=str(datetime.now())
+
+
             out+=under_string+" "
         if out_format=="monitor":
             print(out)
@@ -699,8 +655,6 @@ while True:
             if len(command)<save_number+2:
                 console.print("[red]error miss parma "+"[/]")
             else:
-                print(command[save_number])
-                print(command[save_number+1])
                 try:
                     if command[save_number]==">":
                         with open(command[save_number+1],'w+') as file:

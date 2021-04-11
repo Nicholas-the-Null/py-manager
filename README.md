@@ -20,7 +20,7 @@
     <br />
     <a href="https://github.com/Nicholas-the-Null/py-manager/issues">Report Bug</a>
     ·
-    <a href="https://github.com/Nicholas-the-Null/py-manager/issues">Request Feature</a>
+    <a href="https://github.com/Nicholas-the-Null/py-manager/issues/new?assignees=&labels=&template=feature_request.md&title=">Request Feature</a>
   </p>
 </p>
   

@@ -5,6 +5,7 @@ except ImportError:
     exit()
 
 import os
+import subprocess
 
 try:
     from rich.table import Table
@@ -52,8 +53,32 @@ from getpass import getpass,getuser
 import random ,string
 from datetime import datetime
 import urllib.request, json
+import psutil
 
-with urllib.request.urlopen("https://nicholas-the-null.github.io/py_manager_website/stats.json") as url:data = json.loads(url.read().decode())
+try:
+    with urllib.request.urlopen("https://nicholas-the-null.github.io/py_manager_website/stats.json") as url:data = json.loads(url.read().decode())
+except:
+    data=None
+
+
+import ctypes, sys
+
+import keyboard
+
+
+
+shortcut = 'alt+x' #define your hot-key
+
+
+def on_triggered(): #define your function to be executed on hot-key press
+    pass
+    
+keyboard.add_hotkey(shortcut, on_triggered) 
+
+
+
+
+
 
 console = Console()
 history=[]
@@ -66,6 +91,29 @@ def GetShortPathName(path):
         path=path[len(primitive_path)-1:]
         return path
 
+def checkIfProcessRunning(processName):
+    for proc in psutil.process_iter():
+        try:
+            # Check if process name contains the given name string.
+            if processName.lower() in proc.name().lower():
+                return True
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+    return False;
+
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
+
+def SetProtection():
+	ctypes.windll.ntdll.RtlAdjustPrivilege(20, 1, 0, ctypes.byref(ctypes.c_bool()))
+	ctypes.windll.ntdll.RtlSetProcessIsCritical(1, 0, 0) == 0
+
+def UnsetProtection():
+	ctypes.windll.ntdll.RtlSetProcessIsCritical(0, 0, 0) == 0
+
 
 table = Table(title="info")
 table.add_column("time",style="magenta")
@@ -73,12 +121,18 @@ table.add_column("os",style="green",no_wrap=True)
 table.add_column("version",style="purple",no_wrap=True)
 table.add_column("sha256",style="green",no_wrap=True)
 
-if data.get("sha256")!=main.asset.secure.file_sha256.File_calcolatore_sha256(sys.argv[0]):
+
+if data is None:
+    table.add_column("update",style="green",no_wrap=True)
+    update="error no internet"
+    
+
+elif data.get("sha256")!=main.asset.secure.file_sha256.File_calcolatore_sha256(sys.argv[0]):
     table.add_column("update",style="red",no_wrap=True)
     update="True"
 else:
-    table.add_column("update",style="False",no_wrap=True)
-    update="True"
+    table.add_column("update",style="green",no_wrap=True)
+    update="False"
 
 table.add_row(str(datetime.now()),str(platform.uname().system),"1.0",
 main.asset.secure.file_sha256.File_calcolatore_sha256(sys.argv[0]),update)
@@ -102,11 +156,16 @@ console.print("""[green]
 
 print("")
 
+protect=False
+
 while True:
     
-
+    if is_admin():
+        sys_type="#"
+    else:
+        sys_type="$"
         
-    command=console.input("[green]"+str(os.getcwd())+"[/]>").split()
+    command=console.input("[green]"+str(os.getcwd())+" "+sys_type+"[/]>").split()
     history.append(" ".join(command))
 
     if command[0].lower() in ["hs","hy","history"]: #history of command
@@ -117,6 +176,32 @@ while True:
             table.add_row(str(numero),str(nome))
         
         console.print(table)
+
+    elif command[0]=="sudo":
+        if ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)==42:
+            exit()
+        
+    elif command[0]=="protection":
+        if sys_type=="#" and protect==False:
+            SetProtection()
+            protect=True
+            print("ok")
+        else:
+            print("error")
+
+    elif command[0]=="unprotection":
+        if sys_type=="#" and protect==True:
+            UnsetProtection()
+            protect=False
+            print("ok")
+        else:
+            print("error")
+
+
+    
+    elif command[0]=="update":
+        #downlaod file
+        console.print(data)
 
     elif command[0].lower() in ["cd","changedirectory","chd"]: #change dir
         command.pop(0)
@@ -146,7 +231,10 @@ while True:
             if os.path.exists(command[0]):
                 console.print("[red]error directory already exists"+"[/]")
             else:
-                os.mkdir(command[0])
+                try:
+                    os.mkdir(command[0])
+                except Exception as e:
+                    print(str(e))
 
     elif command[0].lower() in ["getsha","sha256","gtsh","get256"]: #sha256 of file or string
         command.pop(0)
@@ -679,6 +767,69 @@ while True:
                             file.write("\n"+out)
                 except:
                     console.print("[red]error invalid file name "+"[/]")
+
+
+
+    elif command[0] in ["pc","proc","process"]:
+        command.pop(0)
+        if len(command)!=0:
+            if command[0] in ["kill","kl"]:
+                command.pop(0)
+                if len(command)!=0:
+                    if checkIfProcessRunning(command[0]):
+                        try:
+                            subprocess.call("taskkill /F /IM " + command[0])
+                        except Exception as e:
+                            print("error "+str(e))
+                    else:pass
+                else:
+                    console.print("[red]error no parma [/]")
+            if command[0] in ["ch","check","ck"]:
+                command.pop(0)
+                if len(command)!=0:
+                    if checkIfProcessRunning(command[0]):
+                        print("running")
+                    else:
+                        print("not running")
+                else:
+                    console.print("[red]error no parma [/]")
+
+            elif command[0] in ["all","l"]:
+                table=Table(title="process")
+                table.add_column("name")
+                table.add_column("pid")
+                table.add_column("priority level")
+                table.add_column("memory use (kb)")
+                table.add_column("read kbytes")
+                table.add_column("write kbytes")
+                table.add_column("num threads")
+                table.add_column("status")
+
+
+                for proc in psutil.process_iter():
+                    try:
+                        process_name=proc.name()
+                        process_pid=proc.pid
+                        nice = int(proc.nice())
+                        memory_usage = proc.memory_full_info().uss
+                        io_counters = proc.io_counters()
+                        read_bytes = io_counters.read_bytes
+                        write_bytes = io_counters.write_bytes
+                        n_threads = proc.num_threads()
+                        
+                        status=proc.status()
+                        table.add_row(str(process_name),str(process_pid),
+                        str(nice),str(memory_usage//1024),str(read_bytes//1024),
+                        str(write_bytes//1024),str(n_threads),str(status))
+                    
+                        
+
+                    except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                        continue
+                console.print(table)
+
+        else:
+            console.print("[red]error no parma [/]")
 
 
 

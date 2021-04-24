@@ -42,6 +42,8 @@
     </li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#feature">new feature status</a></li>
+
   </ol>
 </details>
 
@@ -83,6 +85,14 @@ See the [open issues]("https://github.com/Nicholas-the-Null/py-manager/issues/is
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
+
+## feature
+
+name | status | possible release date | idea author | importance
+------------ | ------------- | ------------ | ------------- | -------------
+
+cryptography | 50% | 28/04/2021 | author | 5%
+screen recorder | 0% | 8/5/2021 | author | 0%
 
 <p>
 <img src=https://komarev.com/ghpvc/?username=Nicholas-the-Null />

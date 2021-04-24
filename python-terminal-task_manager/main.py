@@ -63,17 +63,7 @@ except:
 
 import ctypes, sys
 
-import keyboard
 
-
-
-shortcut = 'alt+x' #define your hot-key
-
-
-def on_triggered(): #define your function to be executed on hot-key press
-    pass
-    
-keyboard.add_hotkey(shortcut, on_triggered) 
 
 
 
@@ -157,6 +147,8 @@ console.print("""[green]
 print("")
 
 protect=False
+
+
 
 while True:
     
@@ -482,7 +474,7 @@ while True:
         else:
             console.print("[red]file not found"+"[/]")
     
-    elif command[0] in ["ex","exit"]:
+    elif command[0] in ["ex","exit","xexit"]:
         if Confirm.ask("Do you want exit?"):
             print("ok bye have a nice day :)")
             time.sleep(3)
@@ -693,39 +685,8 @@ while True:
         else:
             console.print("[red]error no parma in input "+"[/]")
         
-    elif command[0] in ["en","encrypt"]:
-        command.pop(0)
-        if len(command)!=0:
-            if os.path.exists(command[0]):
-                file=r''+command[0]
-                command.pop(0)
-                if command[0]=="key":
-                    enc=main.asset.secure.cripta.encrypt(file)
-                    print(enc)
-                    main.asset.secure.cripta.Delete_File(file)
-                    os.remove(file)
-                    if Confirm.ask("Do you want save password?"):
-                        with open("key-"+file+".key", "wb") as key_file:key_file.write(enc)
-                    
-                elif command[0]=="password":
-                    bufferSize = 1024 * 1024
-                    password=getpass("give me the password ")
-                    with open(file, "rb") as fIn:
-                        with open(file+"aes", "wb") as fOut:
-                            pyAesCrypt.encryptStream(fIn, fOut, password, bufferSize)
-                    main.asset.secure.cripta.Delete_File(file)
-                    os.remove(file)
-                    
-                else:
-                    console.print("[red]your parma are wrong "+"[/]")
-                
-            else:
-                console.print("[red]error path not found "+"[/]")
+   
 
-
-        else:
-            console.print("[red]error no parma in input "+"[/]")
-        
 
     elif command[0]=="echo":
         command.pop(0)
@@ -830,6 +791,8 @@ while True:
 
         else:
             console.print("[red]error no parma [/]")
+    else:
+        print("command not found")
 
 
 
@@ -846,7 +809,6 @@ while True:
 
     
 
-#TODO process info   - criptografia
 
                 
             

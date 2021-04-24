@@ -89,6 +89,7 @@ Contributions are what make the open source community such an amazing place to b
 ## feature
 
 name | status | possible release date | idea author | importance
+---- | ------ | --------------------- | ------------| -------------
 cryptography | 50% | 28/04/2021 | author | 5%
 screen recorder | 0% | 8/5/2021 | author | 0%
 

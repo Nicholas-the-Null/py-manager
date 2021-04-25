@@ -1,5 +1,4 @@
-  
-import hashlib
+  import hashlib
 
 def File_calcolatore_sha256(filename) -> str:
     sha256 = hashlib.sha256()

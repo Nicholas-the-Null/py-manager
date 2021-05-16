@@ -1,4 +1,3 @@
-  
 import hashlib
 
 def File_calcolatore_sha256(filename) -> str:

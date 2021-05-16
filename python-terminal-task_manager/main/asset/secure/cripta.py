@@ -7,17 +7,47 @@ except:
 import string
 import random
 
-    
-       
-def encrypt(filename):
+
+
+def generate_key():
+    """generate key"""
     f = Fernet.generate_key()
-    f = Fernet(f)
+    return f
+
+
+def create_key(key):
+    f = Fernet(key)
+    return f
+       
+def encrypt(key,filename):
+    f=key
     with open(filename, "rb") as file:
         file_data = file.read()
     encrypted_data = f.encrypt(file_data)
     with open(filename, "wb") as file:
         file.write(encrypted_data)
     del f
+
+
+
+
+def load_key(nome="key"):
+    try:
+        x=open(nome+".key", "rb").read()
+        return x
+    except Exception as e:
+        pass
+
+
+def decrypt(key,filename=None):
+    
+    f = Fernet(key)
+    
+    with open(filename, "rb") as file:
+        encrypted_data = file.read()
+    decrypted_data = f.decrypt(encrypted_data)
+    with open(filename, "wb") as file:
+        file.write(decrypted_data)
 
 
 def secure_delete(path):
@@ -35,5 +65,7 @@ def secure_delete(path):
 
 def Delete_File(file):
     secure_delete(file)
-    encrypt(file)
+    key=generate_key()
+    key=create_key(key)
+    encrypt(key,file)
 

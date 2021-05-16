@@ -45,6 +45,7 @@ except ImportError:
 
 try:
     import requests
+    import pyAesCrypt
 except ImportError:
     input("miss request lib run first installer.py")
 
@@ -160,6 +161,8 @@ while True:
     command=console.input("[green]"+str(os.getcwd())+" "+sys_type+"[/]>").split()
     history.append(" ".join(command))
 
+    if len(command)==0:
+        command=["echo","NULL"]
     if command[0].lower() in ["hs","hy","history"]: #history of command
         table = Table(title="history")
         table.add_column("numero",style="magenta")
@@ -791,14 +794,86 @@ while True:
 
         else:
             console.print("[red]error no parma [/]")
-    else:
-        print("command not found")
-
-
-
-
-
     
+
+
+
+
+
+    elif command[0] in ["en","encrypt"]:
+        command.pop(0)
+        'parma file'
+        if len(command)==1:
+            if os.path.exists(command[0]):
+                bufferSize = 1024 * 1024
+                if os.path.isdir(command[0]):
+                    for file in os.listdir(command[0]):
+                        if os.path.isdir(file) is False:
+                            file=r''+command[0]+"\\"+file
+                            password=getpass(f"give me the password of file {file} ")
+                            with open(file, "rb") as fIn:
+                                with open(file+"aes", "wb") as fOut:
+                                    pyAesCrypt.encryptStream(fIn, fOut, password, bufferSize)
+                            main.asset.secure.cripta.Delete_File(file)
+                            os.remove(file)
+
+                else:
+                    with open(command[0], "rb") as fIn:
+                        password=getpass(f"give me the password of file {command[0]}")
+                        with open(command[0]+"aes", "wb") as fOut:
+                            pyAesCrypt.encryptStream(fIn, fOut, password, bufferSize)
+                    main.asset.secure.cripta.Delete_File(command[0])
+                    
+                    os.remove(command[0])
+
+
+            else:
+                print("path not found")
+        else:
+            print("parma npot found")
+
+  
+        
+
+
+                    
+    elif command[0] in ["dc","decript"]:
+        command.pop(0)
+        if len(command)==1:
+            if os.path.exists(command[0]):
+                bufferSize = 1024 * 1024
+                if os.path.isdir(command[0]):
+                        for file in os.listdir(command[0]):
+                            if os.path.isdir(file) is False:
+                                file=r''+command[0]+"\\"+file
+                                password=getpass(f"give me the password of file {file} ")
+                                encFileSize=os.stat(file).st_size
+                                estensione=input("give me the extension of the output file [important] ")
+                                with open(file, "rb") as fIn:
+                                    try:
+                                        with open(file+"decriptato."+estensione, "wb") as fOut:
+                                            pyAesCrypt.decryptStream(fIn, fOut, password, bufferSize, encFileSize)
+                                    except ValueError:
+                                        os.remove(file+"decriptato"+estensione)
+                                os.remove(command[0])
+                else:
+                    password=getpass(f"give me the password of file {command[0]}")
+                    encFileSize=os.stat(command[0]).st_size
+                    estensione=input("give me the extension of the output file [important] ")
+                    with open(command[0], "rb") as fIn:
+                        try:
+                            with open(command[0]+"decriptato."+estensione, "wb") as fOut:
+                                pyAesCrypt.decryptStream(fIn, fOut, password, bufferSize, encFileSize)
+                        except ValueError:
+                            os.remove(command[0]+"decriptato"+estensione)
+                    os.remove(command[0])
+
+            else:
+                print("path not found")
+
+        else:
+            print("parma npot found")
+   
     
 
 
@@ -807,7 +882,8 @@ while True:
 
             
 
-    
+    else:
+        print("command not found")
 
 
                 

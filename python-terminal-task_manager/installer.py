@@ -28,10 +28,7 @@ else:
         except ImportError:
             os.system("pip install rich")
 
-        try:
-            import win32api
-        except ImportError:
-            os.system("pip install pywin32")
+        
         
         try:
             from tqdm import tqdm

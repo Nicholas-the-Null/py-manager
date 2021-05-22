@@ -1,60 +1,114 @@
+nice_conta_file=0
+
+
 try:
     from rich.console import Console 
+    print(f"[+] success {nice_conta_file}")
+    nice_conta_file+=1
 except ImportError:
     input("miss rich lib run first installer.py")
     exit()
 
 import os
+print(f"[+] success {nice_conta_file}")
+nice_conta_file+=1
 import subprocess
+print(f"[+] success {nice_conta_file}")
+nice_conta_file+=1
 
 try:
     from rich.table import Table
+    print(f"[+] success {nice_conta_file}")
+    nice_conta_file+=1
 except ImportError:
     input("miss rich lib run first installer.py")
     exit()
 
 try:
     from rich.prompt import Confirm
+    print(f"[+] success {nice_conta_file}")
+    nice_conta_file+=1
 except ImportError:
     input("miss rich lib run first installer.py")
     exit()
+
 from datetime import datetime
+print(f"[+] success {nice_conta_file}")
+nice_conta_file+=1
 import platform
+print(f"[+] success {nice_conta_file}")
+nice_conta_file+=1
 
 try:
     import main.asset.secure.file_sha256
+    print(f"[+] success {nice_conta_file}")
+    nice_conta_file+=1
     import main.asset.secure.cripta
+    print(f"[+] success {nice_conta_file}")
+    nice_conta_file+=1
     import main.asset.Down.DonwloadLib as DonwloadLib
+    print(f"[+] success {nice_conta_file}")
+    nice_conta_file+=1
     import main.asset.multi_delete as multi_delete
+    print(f"[+] success {nice_conta_file}")
+    nice_conta_file+=1
 except ImportError:
     input("you miss some file please run installer.py with this code 1789")
 import sys
+print(f"[+] success {nice_conta_file}")
+nice_conta_file+=1
 import time
+print(f"[+] success {nice_conta_file}")
+nice_conta_file+=1
 import shutil
+print(f"[+] success {nice_conta_file}")
+nice_conta_file+=1
 import re
+print(f"[+] success {nice_conta_file}")
+nice_conta_file+=1
 try:
     from tqdm import tqdm
+    print(f"[+] success {nice_conta_file}")
+    nice_conta_file+=1
 except ImportError:
     input("miss tqm lib run first installer.py")
     exit()
 try:
     import pyAesCrypt 
+    print(f"[+] success {nice_conta_file}")
+    nice_conta_file+=1
 except ImportError:
     input("miss pyAesCrypt lib run first installer.py")
     exit()
 
 try:
     import requests
-    import pyAesCrypt
+    print(f"[+] success {nice_conta_file}")
+    nice_conta_file+=1
 except ImportError:
     input("miss request lib run first installer.py")
 
 
 from getpass import getpass,getuser
+print(f"[+] success {nice_conta_file}")
+nice_conta_file+=1
 import random ,string
+print(f"[+] success {nice_conta_file}")
+nice_conta_file+=1
 from datetime import datetime
+print(f"[+] success {nice_conta_file}")
+nice_conta_file+=1
 import urllib.request, json
+print(f"[+] success {nice_conta_file}")
+nice_conta_file+=1
 import psutil
+print(f"[+] success {nice_conta_file}")
+nice_conta_file+=1
+
+input("press a key for continue")
+os.system('cls' if os.name=='nt' else 'clear')
+
+
 
 try:
     with urllib.request.urlopen("https://nicholas-the-null.github.io/py_manager_website/stats.json") as url:data = json.loads(url.read().decode())
@@ -67,13 +121,18 @@ import ctypes, sys
 
 
 
-
+usb_active=False
 
 
 
 console = Console()
 history=[]
 primitive_path=r'C:\\Users\\'+str(getuser())
+
+def diff(list1, list2):
+    list_difference = [item for item in list1 if item not in list2]
+    return list_difference
+
 
 def GetShortPathName(path):
     if os.getcwd in [r"C:\\Users","C:",primitive_path]:
@@ -161,8 +220,20 @@ while True:
     command=console.input("[green]"+str(os.getcwd())+" "+sys_type+"[/]>").split()
     history.append(" ".join(command))
 
+    if usb_active==True:
+        dl = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        drives = ['%s:' % d for d in dl if os.path.exists('%s:' % d)]
+        uncheckeddrives = ['%s:' % d for d in dl if os.path.exists('%s:' % d)]
+        x = diff(uncheckeddrives, drives)
+        x = diff(drives, uncheckeddrives)
+        drives = uncheckeddrives
+        if usb not in drives:
+            usb_active=False
+            os.chdir(original_usb)
+            command=["echo",f"error usb removed return to {original_usb}"]
+        
     if len(command)==0:
-        command=["echo","NULL"]
+        command=["echo","no command in input"]
     if command[0].lower() in ["hs","hy","history"]: #history of command
         table = Table(title="history")
         table.add_column("numero",style="magenta")
@@ -249,6 +320,47 @@ while True:
 
     elif command[0].lower() in ["clear","cls"]:
         os.system("cls")
+
+    elif command[0].lower()=="usb":
+        print("usb menu active")
+        if usb_active==False:
+            original_usb=os.getcwd()
+        dl = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        drives = ['%s:' % d for d in dl if os.path.exists('%s:' % d)]
+        while True:
+            uncheckeddrives = ['%s:' % d for d in dl if os.path.exists('%s:' % d)]
+            x = diff(uncheckeddrives, drives)
+            x = diff(drives, uncheckeddrives)
+            drives = uncheckeddrives
+            print("usb on computer " + str(drives[1:]))
+            menu=input("1-refresh,2-go on usb,3-exit:")
+            if menu=="1":
+                pass
+            elif menu=="2":
+                while True:
+                    usb=input("select usb:")
+                    if usb in drives:
+                        break
+                    else:
+                        print("not found")
+                try:
+                    os.chdir(usb)
+                    usb_active=True
+                    break
+                except:
+                    print("usb removed")
+                break
+
+            elif menu=="3":
+                if usb_active==True:
+                    os.chdir(original_usb)
+                    break
+                else:
+                    break
+            else:
+                print("command not found")
+           
+
 
     elif command[0].lower() in ["more","mr"]: # read file head for print first line default is 10 and tail for the last line
         command.pop(0)
@@ -570,8 +682,8 @@ while True:
         #comando path metodo_eliminzaione modalità altro 
         original=os.getcwd()
         command.pop(0)
-        if not len(command)==0:
-            if os.path.exists(command[0]):
+        if len(command)!=0:
+            if os.path.exists(command[0]) and os.path.isdir(command[0]):
                 os.chdir(command[0])
                 command.pop(0)
                 if not len(command)==0:
@@ -584,7 +696,6 @@ while True:
                     
                     if not len(command)==0:
                         if command[0]=="-duplicate":
-                            print("qui")
                             file_list=multi_delete.delete_duplicate()
 
                         elif command[0]=="-ext":
@@ -683,7 +794,7 @@ while True:
 
 
             else:
-                console.print("[red]error path not found "+"[/]")
+                console.print(f"[red]error {command[0]} dir not found "+"[/]")
                 os.chdir(original)
         else:
             console.print("[red]error no parma in input "+"[/]")

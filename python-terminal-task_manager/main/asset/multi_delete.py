@@ -1,7 +1,4 @@
 import os
-
-import hashlib
-
 from secure.file_sha256 import File_calcolatore_sha256
 
 def delete_duplicate():
@@ -12,14 +9,13 @@ def delete_duplicate():
         if hasha in sha_256:elements.append(file)
         else:
             sha_256.append(hasha)
-    
     return elements 
 
 
 def delete_name(file_name,discrimina=False):
     name=[]
     for x in os.listdir():
-        filename, file_extension = os.path.splitext(x)
+        filename = os.path.splitext(x)[0]
         if discrimina==True and filename!=file_name:name.append(x)
         elif discrimina==False and filename==file_name:name.append(x)
         else:pass
@@ -28,7 +24,7 @@ def delete_name(file_name,discrimina=False):
 def delete_ext(ext="vandalo",discrimina=False):
     name=[]
     for x in os.listdir():
-        filename, file_extension = os.path.splitext(x)
+        file_extension = os.path.splitext(x)[1]
         if discrimina==True and file_extension!=ext:name.append(x)
         elif discrimina==False and file_extension==ext:name.append(x)
         else:pass

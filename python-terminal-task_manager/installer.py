@@ -17,7 +17,6 @@ else:
         print("Welcome to the installation procedure :)")
     
             
-
         try:
             from cryptography.fernet import Fernet
         except:
@@ -29,7 +28,6 @@ else:
             os.system("pip install rich")
 
         
-        
         try:
             from tqdm import tqdm
         except ImportError:
@@ -39,6 +37,7 @@ else:
             import requests
         except ImportError:
             os.system("pip install requests")
+
         try:
             import pyAesCrypt 
         except ImportError:

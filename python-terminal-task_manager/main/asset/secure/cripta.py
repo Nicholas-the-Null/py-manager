@@ -10,7 +10,7 @@ import random
 
 
 def generate_key():
-    """generate key"""
+    """Generate key!"""
     f = Fernet.generate_key()
     return f
 
@@ -18,7 +18,8 @@ def generate_key():
 def create_key(key):
     f = Fernet(key)
     return f
-       
+
+
 def encrypt(key,filename):
     f=key
     with open(filename, "rb") as file:
@@ -36,7 +37,7 @@ def load_key(nome="key"):
         x=open(nome+".key", "rb").read()
         return x
     except Exception as e:
-        pass
+        print(str(e))
 
 
 def decrypt(key,filename=None):

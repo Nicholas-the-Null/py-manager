@@ -2,12 +2,7 @@ import os
 
 import hashlib
 
-def File_calcolatore_sha256(filename) -> str:
-    sha256 = hashlib.sha256()
-    with open(filename, "rb") as thefile:
-        buf = thefile.read()
-        sha256.update(buf)
-    return str(sha256.hexdigest())
+from secure.file_sha256 import File_calcolatore_sha256
 
 def delete_duplicate():
     sha_256=[]

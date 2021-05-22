@@ -90,7 +90,7 @@ Contributions are what make the open source community such an amazing place to b
 
 name | status | possible release date | idea author | importance
 ---- | ------ | --------------------- | ------------| -------------
-cryptography | 50% | 28/04/2021 | author | 5%
+cryptography | 100% | relase | author | 5%
 
 
 <p>

@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup as bs
 from urllib.parse import urljoin, urlparse
 import os
 
-def progress_bar(filename):
+def progress_bar(response,buffer_size,file_size,filename):
     progress = tqdm(response.iter_content(buffer_size), f"Downloading {filename}", total=file_size, unit="B", unit_scale=True, unit_divisor=1024)
     with open(filename, "wb") as f:
         for data in progress:
@@ -17,7 +17,7 @@ def download_file(link):
         response = requests.get(link, stream=True)
         file_size = int(response.headers.get("Content-Length", 0))
         filename = link.split("/")[-1]
-        progress_bar(filename)
+        progress_bar(response,buffer_size,file_size,filename)
         return "Success"
     else:
         return "[red]site not found "+"[/]"
@@ -109,7 +109,7 @@ def image(url):
             print(filename)
 
             # progress bar, changing the unit to bytes instead of iteration (default by tqdm)
-            progress_bar(filename)
+            progress_bar(response,file_size,filename)
         imgs = get_all_images(url)
         for img in imgs:
             download(img)

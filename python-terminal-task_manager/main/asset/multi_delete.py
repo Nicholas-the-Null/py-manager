@@ -1,5 +1,13 @@
 import os
-from secure.file_sha256 import File_calcolatore_sha256
+
+import hashlib
+
+def File_calcolatore_sha256(filename) -> str:
+    sha256 = hashlib.sha256()
+    with open(filename, "rb") as thefile:
+        buf = thefile.read()
+        sha256.update(buf)
+    return str(sha256.hexdigest())
 
 def delete_duplicate():
     sha_256=[]
@@ -9,13 +17,14 @@ def delete_duplicate():
         if hasha in sha_256:elements.append(file)
         else:
             sha_256.append(hasha)
+    
     return elements 
 
 
 def delete_name(file_name,discrimina=False):
     name=[]
     for x in os.listdir():
-        filename = os.path.splitext(x)[0]
+        filename= os.path.splitext(x)[0]
         if discrimina==True and filename!=file_name:name.append(x)
         elif discrimina==False and filename==file_name:name.append(x)
         else:pass

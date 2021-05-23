@@ -52,7 +52,8 @@ try:
     import main.asset.multi_delete as multi_delete
     print(f"[+] success {nice_conta_file}")
     nice_conta_file+=1
-except ImportError:
+except Exception as e:
+    print(str(e))
     input("you miss some file please run installer.py with this code 1789")
 import sys
 print(f"[+] success {nice_conta_file}")
@@ -95,9 +96,6 @@ nice_conta_file+=1
 import random ,string
 print(f"[+] success {nice_conta_file}")
 nice_conta_file+=1
-from datetime import datetime
-print(f"[+] success {nice_conta_file}")
-nice_conta_file+=1
 import urllib.request, json
 print(f"[+] success {nice_conta_file}")
 nice_conta_file+=1
@@ -116,7 +114,7 @@ except:
     data=None
 
 
-import ctypes, sys
+import ctypes
 
 
 

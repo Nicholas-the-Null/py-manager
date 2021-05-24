@@ -52,6 +52,10 @@ try:
     import main.asset.multi_delete as multi_delete
     print(f"[+] success {nice_conta_file}")
     nice_conta_file+=1
+    import main.asset.wifi as wifi
+    print(f"[+] success {nice_conta_file}")
+    nice_conta_file+=1
+
 except Exception as e:
     print(str(e))
     input("you miss some file please run installer.py with this code 1789")
@@ -263,9 +267,27 @@ while True:
 
 
     
-    elif command[0]=="update":
+    elif command[0]=="wifi":
         #downlaod file
-        console.print(data)
+        if len(command)!=0:
+            command.pop(0)
+            if wifi.detect_system_lang()[0:2]!=wifi.lang():
+                print("remember to change language to wifi module")
+            else:
+                for x in command:
+                    if x=="ssid":
+                        print(wifi.get_ssid())
+                    elif x=="auth":
+                        print(wifi.get_auth())
+                    elif x=="password":
+                        print(wifi.get_password(wifi.get_ssid()))
+                    elif x=="show":
+                        wifi.generate_qr_code(wifi.get_ssid(),wifi.get_password(wifi.get_ssid()),wifi.get_auth(),"",True)
+                    elif x=="save":
+                        wifi.generate_qr_code(wifi.get_ssid(),wifi.get_password(wifi.get_ssid()),wifi.get_auth(),"ciao.png",False)
+
+        else:
+            print("error ")
 
     elif command[0].lower() in ["cd","changedirectory","chd"]: #change dir
         command.pop(0)

@@ -32,7 +32,11 @@ else:
             from tqdm import tqdm
         except ImportError:
             os.system("pip install tqdm")
-
+        try:
+            import qrcode
+        except ImportError:
+            os.system("pip install qrcode")
+            
         try:
             import requests
         except ImportError:

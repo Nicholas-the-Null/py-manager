@@ -12,6 +12,7 @@ else:
     print("Welcome to the installation procedure :)")
 
         
+
     try:
         from cryptography.fernet import Fernet
     except:
@@ -44,3 +45,27 @@ else:
     
     print("i've seen enough i'm satisfied")
     input("success")
+
+    try:
+        from tqdm import tqdm
+    except ImportError:
+        os.system("pip install tqdm")
+    try:
+        import qrcode
+    except ImportError:
+        os.system("pip install qrcode")
+        
+    try:
+        import requests
+    except ImportError:
+        os.system("pip install requests")
+
+    try:
+        import pyAesCrypt 
+    except ImportError:
+        input("pip install pyAesCrypt ")
+        exit()
+    
+    print("i've seen enough i'm satisfied")
+    input("success")
+

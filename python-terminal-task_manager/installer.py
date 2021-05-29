@@ -8,41 +8,39 @@ if  platform.uname().system!='Windows':
     exit()
 
 else:
-    code=input("insert code or tab any key for continue ")
-
-    if code=="1789":
-        pass #Download lib package
-
-    else:
-        print("Welcome to the installation procedure :)")
     
-            
-        try:
-            from cryptography.fernet import Fernet
-        except:
-            os.system("pip install cryptography")
-
-        try:
-            from rich.console import Console 
-        except ImportError:
-            os.system("pip install rich")
+    print("Welcome to the installation procedure :)")
 
         
-        try:
-            from tqdm import tqdm
-        except ImportError:
-            os.system("pip install tqdm")
+    try:
+        from cryptography.fernet import Fernet
+    except:
+        os.system("pip install cryptography")
 
-        try:
-            import requests
-        except ImportError:
-            os.system("pip install requests")
+    try:
+        from rich.console import Console 
+    except ImportError:
+        os.system("pip install rich")
 
-        try:
-            import pyAesCrypt 
-        except ImportError:
-            input("pip install pyAesCrypt ")
-            exit()
-        
-        print("i've seen enough i'm satisfied")
-        input("success")
+    
+    try:
+        from tqdm import tqdm
+    except ImportError:
+        os.system("pip install tqdm")
+
+    try:
+        import requests
+    except ImportError:
+        os.system("pip install requests")
+    try:
+        import qrcode
+    except ImportError:
+        os.system("pip install qrcode")
+    try:
+        import pyAesCrypt 
+    except ImportError:
+        input("pip install pyAesCrypt ")
+        exit()
+    
+    print("i've seen enough i'm satisfied")
+    input("success")

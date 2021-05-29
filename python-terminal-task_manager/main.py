@@ -10,8 +10,9 @@ except ImportError:
     exit()
 
 import os
+import mmap
 print(f"[+] success {nice_conta_file}")
-nice_conta_file+=1
+nice_conta_file+=2
 import subprocess
 print(f"[+] success {nice_conta_file}")
 nice_conta_file+=1
@@ -267,7 +268,7 @@ while True:
 
 
     
-    elif command[0]=="wifi":
+    elif command[0].lower()=="wifi":
         #downlaod file
         if len(command)!=0:
             command.pop(0)
@@ -564,18 +565,24 @@ while True:
 
     elif command[0].lower() in ["rm","remove"]: #remove file
         command.pop(0)
-        if len(command)==1:
-            if os.path.exists(command[0]):
+        if len(command)==2:
+            if os.path.exists(command[0]) and command[1]=="-d" and os.path.isdir(command[0])== False:
+                shutil.rmtree(command[0],ignore_errors=True)
+                os.rmdir(command[0])
+            else:
+                print("error ")
+        elif len(command)==1:
+            if os.path.exists(command[0]) and os.path.isdir(command[0])== False:
                 os.remove(command[0])
             else:
-                console.print("[red]file not found"+"[/]")
+                print("path not found or path is a dir")
         else:
             console.print("[red]not parma in input"+"[/]")
     
     elif command[0].lower() in ["srm","secureremove"]: #secure rfemove file
         command.pop(0)
         if len(command)==1:
-            if os.path.exists(command[0]):
+            if os.path.exists(command[0]) and os.path.isdir(command[0])== False:
                 main.asset.secure.cripta.Delete_File(command[0])
                 os.remove(command[0])
             else:
@@ -1008,6 +1015,110 @@ while True:
     
 
 
+
+    elif command[0].lower() in ["scf","search"]:
+        command.pop(0)
+        if len(command)>=4:
+            search=[]
+            file=command[0]#input("name file ? for no ")
+            file_extension = "."+command[1]
+            path= command[2]#"give me the path, $ = actualy dir, ? = all path, ** at end for large search "
+            file_word=" ".join(command[3:len(command)])
+            if len(path)==0:
+                path=None
+            try:
+                if path[len(path)-2:]=="**":
+                    search_long=True
+                else:
+                    search_long=False
+            except:
+                path=None
+
+            if path[0]=="?":
+                path=primitive_path
+            elif path[0]=="$":
+                path=os.getcwd()
+            elif os.path.exists(path) and os.path.isdir(path):
+                path=path
+            else:
+                path=None
+            
+            if path!=None:
+                if file=="?" and file_extension==".?" and file_word=="?+?":
+                    print("error no parma for search file ")
+                else:
+                    if search_long:
+                        for paths, subdirs, files in os.walk(path):
+                            for element in files:
+                                nome=os.path.join(paths, element)
+
+                                if os.path.splitext(element)[0]==file:
+
+                                    if file_extension!=".?" and file_extension==os.path.splitext(element)[1]:
+                                        search.append(nome)
+                                    elif file_extension==".?":
+                                        search.append(nome)
+
+                                if file_extension == os.path.splitext(nome)[1]:
+                                    if file!="?" and os.path.splitext(element)[0]==file:
+                                        search.append(nome)
+                                    elif file=="?":
+                                        search.append(nome)
+
+
+
+                                if file_word!="?+?":
+                                    try:
+                                        with open(nome) as f:
+                                            if file_word in f.read():
+
+                                                if file_extension!=".?" and file_extension==os.path.splitext(element)[1]:
+                                                    search.append(nome)
+                                                elif file!="?" and os.path.splitext(element)[0]==file:
+                                                    search.append(nome)
+                                                elif file_extension==".?" and file=="?":
+                                                    search.append(nome)
+                                    except Exception as e:
+                                        pass
+                    else:
+                        for x in os.listdir(path):
+                            
+                            if  file==os.path.splitext(x)[0]:
+                                if file_extension!=".?" and file_extension==os.path.splitext(x)[1]:
+                                    search.append(r''+path+"\\"+x)
+                                
+                                elif file_extension==".?":
+                                    search.append(r''+path+"\\"+x)
+
+                            if file_extension == os.path.splitext(r''+path+"\\"+x)[1]:
+                                if file!="?" and file==os.path.splitext(x)[0]:
+                                    search.append(r''+path+"\\"+x)
+                                elif file=="?":
+                                    search.append(r''+path+"\\"+x)
+
+
+
+
+                            if file_word!="?+?":
+                                try:
+                                    with open(r''+path+"\\"+x) as f:
+                                        if file_word in f.read():
+                                            if file_extension!=".?" and file_extension==os.path.splitext(x)[1]:
+                                                    search.append(r''+path+"\\"+x)
+                                            elif file!="?" and os.path.splitext(x)[0]==file:
+                                                    search.append(r''+path+"\\"+x)
+                                            elif file_extension==".?" and file=="?":
+                                                    search.append(r''+path+"\\"+x)
+                                            
+                                        
+                                except Exception as e:
+                                    pass
+
+                    search=list(set(search))
+                    print(search)
+
+            else:
+                print("error path not found")
 
 
 

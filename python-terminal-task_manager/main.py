@@ -1,4 +1,20 @@
 nice_conta_file=0
+test_echo_command_sha256=False
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 try:
@@ -10,9 +26,10 @@ except ImportError:
     exit()
 
 import os
-import mmap
+help_path=r''+os.getcwd()+"\\"+"help.txt"
+echo_off=os.getcwd()
 print(f"[+] success {nice_conta_file}")
-nice_conta_file+=2
+nice_conta_file+=1
 import subprocess
 print(f"[+] success {nice_conta_file}")
 nice_conta_file+=1
@@ -214,14 +231,19 @@ protect=False
 
 
 while True:
+    if echo_off!="":
+        echo_off=os.getcwd()
     
     if is_admin():
         sys_type="#"
     else:
         sys_type="$"
         
-    command=console.input("[green]"+str(os.getcwd())+" "+sys_type+"[/]>").split()
-    history.append(" ".join(command))
+    command=console.input("[green]"+str(echo_off)+" "+sys_type+"[/]>").split()
+    if command[0]=="secret":
+        command.pop(0)
+    else:
+        history.append(" ".join(command))
 
     if usb_active==True:
         dl = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -237,19 +259,41 @@ while True:
         
     if len(command)==0:
         command=["echo","no command in input"]
-    if command[0].lower() in ["hs","hy","history"]: #history of command
-        table = Table(title="history")
-        table.add_column("numero",style="magenta")
-        table.add_column("command",style="green",no_wrap=True)
-        for numero,nome in enumerate(history):
-            table.add_row(str(numero),str(nome))
-        
-        console.print(table)
 
-    elif command[0]=="sudo":
+    if command[0].lower() in ["hs","hy","history"]:#history of command
+        if len(command)==3:
+            commando=command[1]
+            file=command[2]
+            if os.path.exists(file) is False:
+                x=open(file,"w+")
+                x.close()
+            if commando==">":commando="w"
+            elif commando==">>":commando="a"
+            else:commando=None
+            if commando !=None:
+                try:
+                    with open(file,commando) as f:
+                        for numero,nome in enumerate(history):
+                            f.write(str(numero+1)+ " " +str(nome)+"\n")
+                except Exception as e:
+                    print("error file not valid "+ str(e))
+
+            else:
+                print("error invalid operator")
+        else:
+            table = Table(title="history")
+            table.add_column("numero",style="magenta")
+            table.add_column("command",style="green",no_wrap=True)
+            for numero,nome in enumerate(history):
+                table.add_row(str(numero+1),str(nome))
+            
+            console.print(table)
+
+    elif command[0].lower()=="sudo":
         if ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)==42:
             exit()
         
+    elif command[0].lower()=="pwd":print(os.getcwd())
     elif command[0]=="protection":
         if sys_type=="#" and protect==False:
             SetProtection()
@@ -340,7 +384,44 @@ while True:
         console.print(table)
 
     elif command[0].lower() in ["clear","cls"]:
-        os.system("cls")
+        command.pop(0)
+        if len(command)==0:
+            os.system("cls")
+        else:
+            if command[0]==">":
+                command.pop(0)
+                if os.path.exists(command[0]) and os.path.isdir(command[0]) is False:
+                    try:
+                        x=open(command[0],"w")
+                        x.write("")
+                        x.close()
+                    except:
+                        print("error during file writing")
+                elif command[0].startswith("history"):
+                    if command[0]=="history":
+                        history=[]
+                    else:
+                        try:
+                            partenza=int(command[0][7])
+                            fine=int(command[0][9])
+                            if fine<partenza:
+                                scambio=fine
+                                fine=partenza
+                                partenza=scambio
+                            lista_app=[]
+                            for numero, stringa in enumerate(history):
+                                if numero+1>=partenza and numero+1 <=fine:#errore elimina numer sbagliati
+                                    print(stringa)
+                                    
+                                else:
+                                    lista_app.append(stringa)
+                            history=lista_app
+
+                        except:
+                            pass
+
+            else:
+                print("error")
 
     elif command[0].lower()=="usb":
         print("usb menu active")
@@ -391,14 +472,16 @@ while True:
                     if len(command)==1:
                         with open(command[0],'r') as Read_file:
                             file_contenent=Read_file.readlines()
+                        number_line_conta=0
                         for number_line,line in enumerate(file_contenent):
-                            if number_line==10:
+                            if number_line_conta==10:
                                 if not Confirm.ask("more"):
                                     break
                                 else:
-                                    number_line=0
+                                    number_line_conta=0
                             else:
                                 print(line.strip())
+                                number_line_conta+=1
                     else:
                         if command[1].lower()=="tail":
                             number=10
@@ -435,7 +518,7 @@ while True:
                         else:
                             console.print(f"[red]error parma {command[1]} not found"+"[/]")
 
-                except PermissionError:
+                except Exception:
                     console.print("[red]error i cant read file"+"[/]")
             else:
                 console.print("[red]error file not found"+"[/]")
@@ -541,23 +624,40 @@ while True:
         if len(command)>1:
             if os.path.exists(command[0]):
                 try:
-                    shutil.copyfile(command[0],command[1])
-                except:
-                    console.print("[red]error i cant create new file"+"[/]")
+                    ver=False
+                    path=os.path.split(command[1])[0]
+                    input(path)
+                    if path=="":
+                        path=os.getcwd()
+                    for x in os.listdir(path):
+                        if r''+path+'\\'+x==command[1]:
+                            if Confirm.ask("there are a file with the same do you want replace"):
+                                pass
+                            else:
+                                ver=True                           
+                    if ver==False:shutil.copyfile(command[0],command[1])
+                except Exception as e:
+                    console.print("[red]error i cant create new file "+str(e)+"[/]")
             else:
                 console.print("[red]file not found"+"[/]")
         else:
             console.print("[red]not parma in input"+"[/]")
 
+
     elif command[0].lower() in ["mv","move"]: #move file in another folder
         command.pop(0)
         if len(command)>1:
             if os.path.exists(command[0]):
-                try:
-                    shutil.move(command[0],command[1])
-                    #os.remove(command[0])
-                except:
-                    console.print("[red]error i cant create new file"+"[/]")
+                path=os.path.exists(os.path.split(command[1])[0])
+                if path=="":
+                    path=os.getcwd()
+                if os.path.exists(path):
+                    try:
+                        shutil.move(command[0],command[1])
+                    except Exception as e:
+                        console.print("[red]error i cant create new file "+str(e)+"[/]")
+                else:
+                    console.print("[red]file not found"+"[/]")
             else:
                 console.print("[red]file not found"+"[/]")
         else:
@@ -565,19 +665,57 @@ while True:
 
     elif command[0].lower() in ["rm","remove"]: #remove file
         command.pop(0)
-        if len(command)==2:
-            if os.path.exists(command[0]) and command[1]=="-d" and os.path.isdir(command[0])== False:
-                shutil.rmtree(command[0],ignore_errors=True)
-                os.rmdir(command[0])
+        if len(command)==1:
+            if command[0]=="-a":
+                for x in os.listdir():
+                    if os.path.isdir(x) is False:os.remove(x)
+            else:
+                if os.path.exists(command[0]) and os.path.isdir(command[0]) is False:
+                    os.remove(command[0])
+                else:
+                    print("error i cant delete element")
+        elif len(command)==2:
+            path=command[0]
+            parma=command[1]
+            if path=="-a" and parma=="-d":
+                for x in os.listdir():
+                    if os.path.isdir(x):
+                        shutil.rmtree(x,ignore_errors=True)
+                        #os.rmdir(x)
+                    else:
+                        os.remove(x)
+
+            elif os.path.exists(path) and os.path.isdir(path) and parma=="-d":
+                shutil.rmtree(path,ignore_errors=True)
+                if os.getcwd()!=path:
+                    os.rmdir(path)
+
+            elif os.path.exists(path) and os.path.isdir(path) and parma=="-a":
+                for x in os.listdir(path):
+                    if os.path.isdir(r''+path+'\\'+x) is False:os.remove(r''+path+'\\'+x)
             else:
                 print("error ")
-        elif len(command)==1:
-            if os.path.exists(command[0]) and os.path.isdir(command[0])== False:
-                os.remove(command[0])
+
+        elif len(command)==3:
+            path=command[0]
+            parma1=command[1]
+            parma2=command[2]
+            if os.path.exists(path) and os.path.isdir(path) and ((parma1=="-a" and parma2=="-d") or (parma1=="-d" or parma2=="-a")):
+                for x in os.listdir(path):
+                    if os.path.isdir(r''+path+'\\'+x) is False:os.remove(r''+path+'\\'+x)
+                    else:
+                        shutil.rmtree(r''+path+'\\'+x,ignore_errors=True)
+                        #os.rmdir(r''+path+'\\'+x)
+                if os.getcwd()!=path:
+                    os.rmdir(path)
             else:
-                print("path not found or path is a dir")
+                print("error")
+
+
+
         else:
-            console.print("[red]not parma in input"+"[/]")
+            print("error command wrong")
+
     
     elif command[0].lower() in ["srm","secureremove"]: #secure rfemove file
         command.pop(0)
@@ -828,47 +966,62 @@ while True:
         
    
 
-
     elif command[0]=="echo":
         command.pop(0)
         out=""
         out_format="monitor"
         save_number=0
-        for number,under_string in enumerate(command):
-            
-            if under_string in [">",">>"]:
-                save_number=number
-                out_format="file"
-                break
-            if under_string[:5]=="date:":
-                formatto=under_string[5:]
-                formatto=formatto.replace("?"," ")
-                if formatto in [None,""," "]:under_string=str(datetime.now())
-                try:
-                    under_string=datetime.now()
-                    under_string=str(under_string.strftime(formatto))
-                except Exception as e:
-                    print(e)
-                    under_string=str(datetime.now())
-
-
-            out+=under_string+" "
-        if out_format=="monitor":
-            print(out)
-        else:
-
-            if len(command)<save_number+2:
-                console.print("[red]error miss parma "+"[/]")
+        if len(command)==1 and command[0]=="off":
+            if echo_off!="":
+                echo_off=""
             else:
-                try:
-                    if command[save_number]==">":
-                        with open(command[save_number+1],'w+') as file:
-                            file.write(out)
-                    else:
-                        with open(command[save_number+1],'a') as file:
-                            file.write("\n"+out)
-                except:
-                    console.print("[red]error invalid file name "+"[/]")
+                echo_off=os.getcwd()
+        else:
+            for number,under_string in enumerate(command):
+                
+                if under_string in [">",">>"]:
+                    save_number=number
+                    out_format="file"
+                    break
+                if under_string[:5]=="date:":
+                    formatto=under_string[5:]
+                    formatto=formatto.replace("?"," ")
+                    if formatto in [None,""," "]:under_string=str(datetime.now())
+                    try:
+                        under_string=datetime.now()
+                        under_string=str(under_string.strftime(formatto))
+                    except Exception as e:
+                        print(e)
+                        under_string=str(datetime.now())
+                
+                if under_string=="%pwd":under_string=str(os.getcwd())
+                if test_echo_command_sha256==True:
+                    under_string=""
+                    test_echo_command_sha256=False
+                if under_string=="%Sha256" and len(command)>number+1:
+                    
+                    under_string=main.asset.secure.file_sha256.String_calcolatore_sha256(command[number+1])
+                    test_echo_command_sha256=True
+
+
+
+                out+=under_string+" "
+            if out_format=="monitor":
+                print(out)
+            else:
+
+                if len(command)<save_number+2:
+                    console.print("[red]error miss parma "+"[/]")
+                else:
+                    try:
+                        if command[save_number]==">":
+                            with open(command[save_number+1],'w+') as file:
+                                file.write(out)
+                        else:
+                            with open(command[save_number+1],'a') as file:
+                                file.write("\n"+out)
+                    except:
+                        console.print("[red]error invalid file name "+"[/]")
 
 
 

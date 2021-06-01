@@ -1,129 +1,47 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+import os
+import platform
 
-# C extensions
-*.so
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+if  platform.uname().system!='Windows':
+    input("you are not using win")
+    exit()
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+else:
+    
+    print("Welcome to the installation procedure :)")
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+        
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
+    try:
+        from cryptography.fernet import Fernet
+    except:
+        os.system("pip install cryptography")
 
-# Translations
-*.mo
-*.pot
+    try:
+        from rich.console import Console 
+    except ImportError:
+        os.system("pip install rich")
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+    
+    try:
+        from tqdm import tqdm
+    except ImportError:
+        os.system("pip install tqdm")
 
-# Flask stuff:
-instance/
-.webassets-cache
+    try:
+        import requests
+    except ImportError:
+        os.system("pip install requests")
+    try:
+        import qrcode
+    except ImportError:
+        os.system("pip install qrcode")
+    try:
+        import pyAesCrypt 
+    except ImportError:
+        input("pip install pyAesCrypt ")
+        exit()
+    
+    print("i've seen enough i'm satisfied")
+    input("success")
 
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-.python-version
-
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
-
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/

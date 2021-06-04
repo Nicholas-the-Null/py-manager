@@ -72,7 +72,7 @@ You need to install python, that can be done [here](https://www.python.org)
    ```
 2. Install Python packages
    ```sh
-   run installer.py
+   python installer.py
    ```
    
 

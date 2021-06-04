@@ -50,6 +50,10 @@ except ImportError:
     input("miss rich lib run first installer.py")
     exit()
 
+from random import randint
+print(f"[+] success {nice_conta_file}")
+nice_conta_file+=1
+
 from datetime import datetime
 print(f"[+] success {nice_conta_file}")
 nice_conta_file+=1
@@ -71,6 +75,9 @@ try:
     print(f"[+] success {nice_conta_file}")
     nice_conta_file+=1
     import main.asset.wifi as wifi
+    print(f"[+] success {nice_conta_file}")
+    nice_conta_file+=1
+    import main.asset.correttore as Correttore
     print(f"[+] success {nice_conta_file}")
     nice_conta_file+=1
 
@@ -204,7 +211,8 @@ else:
     table.add_column("update",style="green",no_wrap=True)
     update="False"
 
-table.add_row(str(datetime.now()),str(platform.uname().system),"1.0",
+version=data.get("version")
+table.add_row(str(datetime.now()),str(platform.uname().system),version, #versione giusta
 main.asset.secure.file_sha256.File_calcolatore_sha256(sys.argv[0]),update)
 
 console.print(table)
@@ -240,6 +248,8 @@ while True:
         sys_type="$"
         
     command=console.input("[green]"+str(echo_off)+" "+sys_type+"[/]>").split()
+    if len(command)==0:
+        command=["echo","no command in input"]
     if command[0]=="secret":
         command.pop(0)
     else:
@@ -294,6 +304,7 @@ while True:
             exit()
         
     elif command[0].lower()=="pwd":print(os.getcwd())
+
     elif command[0]=="protection":
         if sys_type=="#" and protect==False:
             SetProtection()
@@ -320,15 +331,15 @@ while True:
                 print("remember to change language to wifi module")
             else:
                 for x in command:
-                    if x=="ssid":
+                    if x=="-ssid":
                         print(wifi.get_ssid())
                     elif x=="auth":
                         print(wifi.get_auth())
-                    elif x=="password":
+                    elif x=="-password":
                         print(wifi.get_password(wifi.get_ssid()))
-                    elif x=="show":
+                    elif x=="-show":
                         wifi.generate_qr_code(wifi.get_ssid(),wifi.get_password(wifi.get_ssid()),wifi.get_auth(),"",True)
-                    elif x=="save":
+                    elif x=="-save":
                         wifi.generate_qr_code(wifi.get_ssid(),wifi.get_password(wifi.get_ssid()),wifi.get_auth(),"ciao.png",False)
 
         else:
@@ -370,10 +381,10 @@ while True:
     elif command[0].lower() in ["getsha","sha256","gtsh","get256"]: #sha256 of file or string
         command.pop(0)
         if os.path.exists(command[0]):
-            input_type= "File" 
+            input_type= "-file" 
             result=main.asset.secure.file_sha256.File_calcolatore_sha256(command[0])
         else:
-            input_type="string" 
+            input_type="-string" 
             result=main.asset.secure.file_sha256.String_calcolatore_sha256(command[0])
         
         table=Table(title="info")
@@ -402,8 +413,30 @@ while True:
                         history=[]
                     else:
                         try:
-                            partenza=int(command[0][7])
-                            fine=int(command[0][9])
+                            i=7
+                            partenza=""
+                            while True:
+                                if command[0][i]!=":":
+                                    partenza+=command[0][i]
+                                else:
+                                    break
+                                i+=1
+
+
+                            partenza=int(partenza)
+                            
+                            fine=""
+                            i+=1
+                            while True:
+                                if i==len(command[0]):break
+                                
+                                if command[0][i].isnumeric() is True:
+                                    fine+=command[0][i]
+                                else:
+                                    break
+                                i+=1
+                            
+                            fine=int(partenza)
                             if fine<partenza:
                                 scambio=fine
                                 fine=partenza
@@ -440,17 +473,23 @@ while True:
                 pass
             elif menu=="2":
                 while True:
-                    usb=input("select usb:")
-                    if usb in drives:
+                    danger=False
+                    try:
+                        usb=input("select usb: ctrl+c for exit")
+                        if usb in drives:
+                            break
+                        else:
+                            print("not found")
+                    except KeyboardInterrupt:
+                        danger=True
                         break
-                    else:
-                        print("not found")
                 try:
                     os.chdir(usb)
                     usb_active=True
                     break
                 except:
-                    print("usb removed")
+                    if danger==False:
+                        print("usb removed")
                 break
 
             elif menu=="3":
@@ -463,6 +502,46 @@ while True:
                 print("command not found")
            
 
+    elif command[0].lower() in ["rd","random","rnd"]:
+        command.pop(0)
+        if len(command)>=3:
+            start=command[0]
+            finish=command[1]
+            many=command[2]
+            try: 
+                start=int(start)
+                finish=int(finish)
+                many=int(many)
+                if finish<start:
+                    app=start
+                    start=finish
+                    finish=app
+                if len(command)>=4:
+                    if command[3]=="-duplicate":
+                        duplicate=True
+                    else:
+                        duplicate=False
+                else:
+                    duplicate=False
+                if duplicate == True and (finish-start)<many:
+                    print("error too few with duplicate parma will be disable")
+                    duplicate=False
+                return_list=[]
+                while True:
+                    if len(return_list)==many:
+                        break
+                    return_list.append(randint(start,finish))
+                    if duplicate==True:
+                        return_list=list(set(return_list))
+                if len(command)==5:
+                    if command[4]=="-sort":
+                        return_list.sort()
+                print(return_list)
+            except ValueError:
+                print("error string insert on numer request")
+        
+        else:
+            print("error parma not given in input")
 
     elif command[0].lower() in ["more","mr"]: # read file head for print first line default is 10 and tail for the last line
         command.pop(0)
@@ -483,7 +562,7 @@ while True:
                                 print(line.strip())
                                 number_line_conta+=1
                     else:
-                        if command[1].lower()=="tail":
+                        if command[1].lower()=="-tail":
                             number=10
                             if not len(command)==2:number=int(command[2])
                             with open(command[0],'r') as Read_file:
@@ -504,7 +583,7 @@ while True:
 
                             
 
-                        elif command[1].lower()=="head":
+                        elif command[1].lower()=="-head":
                             number=10
                             if not len(command)==2:number=int(command[2])
                             with open(command[0],'r') as Read_file:
@@ -626,7 +705,6 @@ while True:
                 try:
                     ver=False
                     path=os.path.split(command[1])[0]
-                    input(path)
                     if path=="":
                         path=os.getcwd()
                     for x in os.listdir(path):
@@ -781,7 +859,7 @@ while True:
                 else:
                     console.print("[red]error parma dont match"+"[/]")
 
-            elif command[0]=="site-js":
+            elif command[0]=="-site-js":
                 command.pop(0)
                 if not len(command)==0:
                     if len(command)==2:
@@ -795,7 +873,7 @@ while True:
                 else:
                     console.print("[red]error parma dont match"+"[/]")
 
-            elif command[0]=="site-css":
+            elif command[0]=="-site-css":
                 command.pop(0)
                 if not len(command)==0:
                     if len(command)==2:
@@ -811,7 +889,7 @@ while True:
 
 
 
-            elif command[0]=="site-image":
+            elif command[0]=="-site-image":
                 command.pop(0)
                 if not len(command)==0:
                     if len(command)==2:
@@ -1028,7 +1106,7 @@ while True:
     elif command[0] in ["pc","proc","process"]:
         command.pop(0)
         if len(command)!=0:
-            if command[0] in ["kill","kl"]:
+            if command[0] in ["-kill","-kl"]:
                 command.pop(0)
                 if len(command)!=0:
                     if checkIfProcessRunning(command[0]):
@@ -1039,7 +1117,7 @@ while True:
                     else:pass
                 else:
                     console.print("[red]error no parma [/]")
-            if command[0] in ["ch","check","ck"]:
+            if command[0] in ["-ch","-check","-ck"]:
                 command.pop(0)
                 if len(command)!=0:
                     if checkIfProcessRunning(command[0]):
@@ -1049,7 +1127,7 @@ while True:
                 else:
                     console.print("[red]error no parma [/]")
 
-            elif command[0] in ["all","l"]:
+            elif command[0] in ["-all","-l"]:
                 table=Table(title="process")
                 table.add_column("name")
                 table.add_column("pid")
@@ -1279,7 +1357,13 @@ while True:
 
     else:
         print("command not found")
-
+        x=Correttore.Correttore(["hs","hy","history","sudo","pwd","protection","unprotection","wifi","cd","changedirectory","chd","md","mkd","mkdir","getsha","sha256","gtsh","get256","clear","cls","usb","more","mr","ls","listdir","lsdir","cp","copy","mv","move","rm","remove","srm","secureremove","grep","grp","gp","ex","exit","xexit","dn","down","download","mrm","multiremove","echo","pc","proc","process","en","encrypt","dc","decript","scf","search","rd","random","rnd"],1,command[0])
+        if len(x)>1:
+            x=" ".join(x)
+        else:
+            x="".join(x)
+        if len(x)!=0:
+            print("similar command " + "".join(x))
 
                 
             

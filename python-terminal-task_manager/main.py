@@ -124,6 +124,8 @@ try:
 except ImportError:
     input('\033[31m'+"miss request lib run first installer.py")
     exit()
+
+import zipfile
     
 input("press a key for continue")
 os.system('cls' if os.name=='nt' else 'clear')
@@ -138,6 +140,7 @@ except:
 
 import ctypes
 
+counter_error_passer=0
 
 
 
@@ -148,12 +151,25 @@ usb_active=False
 console = Console()
 history=[]
 primitive_path=r'C:\\Users\\'+str(getuser())
+plugin_path=r''+os.getcwd()+"\\plugin"
+error_log_path=r''+os.getcwd()+"\\log.txt"
+if os.path.exists(error_log_path) is False:
+    with open(error_log_path,"w+") as file:
+        pass
 
 def diff(list1, list2):
     list_difference = [item for item in list1 if item not in list2]
     return list_difference
 
-
+def error_log(command,error):
+    global counter_error_passer
+    counter_error_passer+=1
+    ora=datetime.now()
+    ora=ora.strftime("%d-%b-%Y (%H:%M:%S.%f)")
+    with open(error_log_path,"a") as logs:
+        logs.write("error at "+ora+" in command " + command + " with this message " + error +"\n")
+    if counter_error_passer%100==0:
+        print("error if you want report please send log.txt file text to https://github.com/Nicholas-the-Null/py-manager/issues")
 def GetShortPathName(path):
     if os.getcwd in [r"C:\\Users","C:",primitive_path]:
         path=path
@@ -230,6 +246,11 @@ print("")
 
 protect=False
 
+multiple_command=[]
+multi_command_parse=[]
+multi_command_string=""
+multi_command_parse_string=""
+
 
 
 while True:
@@ -242,9 +263,34 @@ while True:
         else:
             sys_type="$"
             
-        command=console.input("[green]"+str(echo_off)+" "+sys_type+"[/]>").split()
+        if len(multi_command_string)!=0:
+            multiple_command=multi_command_string.split()
+            command=multiple_command
+            multi_command_string=""
+
+
+
+        else:
+            command=console.input("[green]"+str(echo_off)+" "+sys_type+"[/]>").split()
+        if "|" in command:
+            found=False
+            for commands in command:
+                if commands=="|" and found==False:
+                    found=True
+                    multi_command_parse=multi_command_parse_string.split()
+                else:
+                    if len(multi_command_parse)==0:
+                        multi_command_parse_string+=commands+" "
+                    else:
+                        multi_command_string+=commands+" "
+            command=multi_command_parse
+            multi_command_parse_string=""
+            multi_command_parse=[]
+#pwd | ls -l | echo ciao | scf ? ? $** import os | pwd
+
+        
         if len(command)==0:
-            command=["echo","no command in input"]
+            command=["echo",""]
         if command[0]=="secret":
             command.pop(0)
         else:
@@ -269,9 +315,12 @@ while True:
             if len(command)==3:
                 commando=command[1]
                 file=command[2]
-                if os.path.exists(file) is False:
-                    x=open(file,"w+")
-                    x.close()
+                try:
+                    if os.path.exists(file) is False:
+                        x=open(file,"w+")
+                        x.close()
+                except Exception as e:
+                    error_log("history",str(e))
                 if commando==">":commando="w"
                 elif commando==">>":commando="a"
                 else:commando=None
@@ -282,6 +331,7 @@ while True:
                                 f.write(str(numero+1)+ " " +str(nome)+"\n")
                     except Exception as e:
                         print("error file not valid "+ str(e))
+                        error_log("history",str(e))
 
                 else:
                     print("error invalid operator")
@@ -293,6 +343,13 @@ while True:
                     table.add_row(str(numero+1),str(nome))
                 
                 console.print(table)
+
+        elif command[0]=="update":
+            if update=="True":
+                #DonwloadLib.download_file("https://site.todonwload")#site
+                print("download complete")
+            else:
+                print("no download found")             
 
         elif command[0].lower()=="sudo":
             if ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)==42:
@@ -371,6 +428,7 @@ while True:
                         os.mkdir(command[0])
                     except Exception as e:
                         print(str(e))
+                        error_log("history",str(e))
 
         elif command[0].lower() in ["getsha","sha256","gtsh","get256"]: #sha256 of file or string
             command.pop(0)
@@ -400,8 +458,9 @@ while True:
                             x=open(command[0],"w")
                             x.write("")
                             x.close()
-                        except:
+                        except Exception as e:
                             print("error during file writing")
+                            error_log("history",str(e))
                     elif command[0].startswith("history"):
                         if command[0]=="history":
                             history=[]
@@ -444,7 +503,8 @@ while True:
                                         lista_app.append(stringa)
                                 history=lista_app
 
-                            except:
+                            except Exception as e:
+                                error_log("history",str(e))
                                 pass
 
                 else:
@@ -537,6 +597,7 @@ while True:
                     print(return_list)
                 except ValueError:
                     print("error string insert on numer request")
+                    error_log("history","valueError")
             
             else:
                 print("error parma not given in input")
@@ -595,8 +656,9 @@ while True:
                             else:
                                 console.print(f"[red]error parma {command[1]} not found"+"[/]")
 
-                    except Exception:
+                    except Exception as e:
                         console.print("[red]error i cant read file"+"[/]")
+                        error_log("history",str(e))
                 else:
                     console.print("[red]error file not found"+"[/]")
 
@@ -771,6 +833,7 @@ while True:
                         if ver==False:shutil.copyfile(command[0],command[1])
                     except Exception as e:
                         console.print("[red]error i cant create new file "+str(e)+"[/]")
+                        error_log("history",str(e))
                 else:
                     console.print("[red]file not found"+"[/]")
             else:
@@ -789,6 +852,7 @@ while True:
                             shutil.move(command[0],command[1])
                         except Exception as e:
                             console.print("[red]error i cant create new file "+str(e)+"[/]")
+                            error_log("history",str(e))
                     else:
                         console.print("[red]file not found"+"[/]")
                 else:
@@ -874,6 +938,7 @@ while True:
                         console.print(table)
                     except Exception as e:
                         print("error "+str(e))
+                        error_log("history",str(e))
                 else:
                     print("error file not dound or is a dir")
             else:
@@ -897,29 +962,29 @@ while True:
 
         elif command[0].lower() in ["grep","grp","gp"]: #print line where a string parma -i for regex use and -s for print only number of line parma -i first
             command.pop(0)
-            count=0
-            if os.path.exists(command[0]) and os.path.isdir(command[0])==False:
-                if not len(command)==1:
-                    
-                    parola=command[1]
-                    if len(command)==3:
-                        if command[2]=="-i":
-                            parola=parola.lower()+"|"+parola[0].capitalize()
-                    regex=re.compile(parola)
-                    with open(command[0],"r") as file:
-                        filee=file.readlines()
-                    for line in filee:
-                        if regex.search(line):
-                            if "-s" not in command:
-                                print(line)
-                            count+=1
-                    print(count)
+            try:
+                count=0
+                if os.path.exists(command[0]) and os.path.isdir(command[0])==False:
+                    if not len(command)==1:
+                        parola=command[1]
+                        regex=re.compile(r''+parola)                  
+                        with open(command[0],"r") as file:
+                            filee=file.readlines()
+                        for line in filee:
+                            if regex.search(line):
+                                if "-s" not in command:
+                                    print(str(count) + " "+ line.strip())
+                                count+=1
+                        print("count " + str(count))
+
+                    else:
+                        console.print("[red]not parma in input"+"[/]")
 
                 else:
-                    console.print("[red]not parma in input"+"[/]")
-
-            else:
-                console.print("[red]file not found"+"[/]")
+                    console.print("[red]file not found"+"[/]")
+            except Exception as e:
+                print("error in regx read")
+                error_log("history",str(e))
         
         elif command[0] in ["ex","exit","xexit"]:
             if Confirm.ask("Do you want exit?"):
@@ -1160,6 +1225,7 @@ while True:
                             under_string=str(under_string.strftime(formatto))
                         except Exception as e:
                             print(e)
+                            error_log("history",str(e))
                             under_string=str(datetime.now())
                     
                     if under_string=="%pwd":under_string=str(os.getcwd())
@@ -1204,6 +1270,7 @@ while True:
                                 subprocess.call("taskkill /F /IM " + command[0])
                             except Exception as e:
                                 print("error "+str(e))
+                                error_log("history",str(e))
                         else:pass
                     else:
                         console.print("[red]error no parma [/]")
@@ -1269,7 +1336,7 @@ while True:
                         for file in os.listdir(command[0]):
                             if os.path.isdir(file) is False:
                                 file=r''+command[0]+"\\"+file
-                                password=getpass(f"give me the password of file {file} ")
+                                password=getpass(f"give me the password of file {file}: ")
                                 with open(file, "rb") as fIn:
                                     with open(file+"aes", "wb") as fOut:
                                         pyAesCrypt.encryptStream(fIn, fOut, password, bufferSize)
@@ -1279,7 +1346,7 @@ while True:
                     else:
                         with open(command[0], "rb") as fIn:
                             password=getpass(f"give me the password of file {command[0]}")
-                            with open(command[0]+"aes", "wb") as fOut:
+                            with open(command[0]+"AES", "wb") as fOut:
                                 pyAesCrypt.encryptStream(fIn, fOut, password, bufferSize)
                         main.asset.secure.cripta.Delete_File(command[0])
                         
@@ -1305,16 +1372,23 @@ while True:
                             for file in os.listdir(command[0]):
                                 if os.path.isdir(file) is False:
                                     file=r''+command[0]+"\\"+file
-                                    password=getpass(f"give me the password of file {file} ")
+                                    password=getpass(f"give me the password of file {file}: ")
                                     encFileSize=os.stat(file).st_size
                                     estensione=input("give me the extension of the output file [important] ")
                                     with open(file, "rb") as fIn:
                                         try:
                                             with open(file+"decriptato."+estensione, "wb") as fOut:
-                                                pyAesCrypt.decryptStream(fIn, fOut, password, bufferSize, encFileSize)
+                                                try:
+                                                    pyAesCrypt.decryptStream(fIn, fOut, password, bufferSize, encFileSize)
+                                                except Exception as e:
+                                                    print("password wrong")
+                                                    error_log("history",str(e))
                                         except ValueError:
                                             os.remove(file+"decriptato"+estensione)
-                                    os.remove(command[0])
+                                    try:
+                                        os.remove(file)
+                                    except:
+                                        pass
                     else:
                         password=getpass(f"give me the password of file {command[0]}")
                         encFileSize=os.stat(command[0]).st_size
@@ -1322,10 +1396,17 @@ while True:
                         with open(command[0], "rb") as fIn:
                             try:
                                 with open(command[0]+"decriptato."+estensione, "wb") as fOut:
-                                    pyAesCrypt.decryptStream(fIn, fOut, password, bufferSize, encFileSize)
+                                    try:
+                                        pyAesCrypt.decryptStream(fIn, fOut, password, bufferSize, encFileSize)
+                                    except Exception as e:
+                                        print("password wrong")
+                                        error_log("history",str(e))
                             except ValueError:
                                 os.remove(command[0]+"decriptato"+estensione)
-                        os.remove(command[0])
+                        try:
+                            os.remove(command[0])
+                        except:
+                            pass
 
                 else:
                     print("path not found")
@@ -1401,14 +1482,15 @@ while True:
                                         type_search_word=True
                                         try:
                                             with open(nome,encoding="utf-8") as f:
-                                                regex=re.compile(file_word)
+                                                regex=re.compile(r''+file_word)
                                                 file_read=f.readlines()
                                                 for line in file_read:
                                                     line=line.strip()
                                                     if regex.search(line):
                                                         search.append(nome)
                                                         break
-                                        except Exception as E:
+                                        except Exception as e:
+                                            error_log("history",str(e))
                                             pass
                         else:
                             for x in os.listdir(path):
@@ -1432,14 +1514,15 @@ while True:
                                     type_search_word=True
                                     try:
                                         with open(r''+path+"\\"+x,encoding="utf-8") as f:
-                                            regex=re.compile(file_word)
+                                            regex=re.compile(r''+file_word)
                                             file_read=f.readlines()
                                             for line in file_read:
                                                 line=line.strip()
                                                 if regex.search(line):
                                                     search.append(r''+path+"\\"+x)
                                                     break
-                                    except Exception:
+                                    except Exception as e:
+                                        error_log("history",str(e))
                                         pass
 
                         search=list(set(search))
@@ -1448,7 +1531,7 @@ while True:
                         if file_word!="?+?" and type_search_word==False:
 
                             checker=True
-                            regex=re.compile(file_word)  
+                            regex=re.compile(r''+file_word)
                             for element in search:
                                 try:
                                     with open(element,encoding="utf-8") as f:
@@ -1459,7 +1542,8 @@ while True:
                                                 search_final.append(element)
                                                 break
 
-                                except Exception:
+                                except Exception as e:
+                                    error_log("history",str(e))
                                     pass
 
                         if checker==True:
@@ -1483,7 +1567,13 @@ while True:
                 file=command[0]
                 command.pop(0)
                 if os.path.exists(file):
-                    num_lines = sum(1 for line in open(file))
+                    try:
+                        num_lines = sum(1 for line in open(file))
+                    except Exception as e:
+                        error_log("history",str(e))
+                        print("error during file read ")
+
+                        number_line=0
                     command_file=command[0]
                     line=int(command[1])
                     command.pop(0)
@@ -1495,42 +1585,58 @@ while True:
                         if len(command)!=0:
                             phrase=" ".join(command)
                         if command_file=="-read":
-                            with open(file,"r") as file_read:
-                                for line_number, lines in enumerate(file_read):
-                                    if line==line_number+1:
-                                        print(lines)
-                                        break
+                            try:
+                                with open(file,"r") as file_read:
+                                    for line_number, lines in enumerate(file_read):
+                                        if line==line_number+1:
+                                            print(lines)
+                                            break
+                            except Exception as e:
+                                error_log("history",str(e))
+                                print("error during operetion")
                         elif command_file=="-getline":print(num_lines)
                         elif command_file=="-delete":
-                            with open(file,"r") as file_read:
-                                list_line=file_read.readlines()
-                            with open(file,"w") as file_write:
-                                for line_number,lines in enumerate(list_line):
-                                    if line_number+1==line:
-                                        pass
-                                    else:
-                                        file_write.write(lines)
+                            try:
+                                with open(file,"r") as file_read:
+                                    list_line=file_read.readlines()
+                                with open(file,"w") as file_write:
+                                    for line_number,lines in enumerate(list_line):
+                                        if line_number+1==line:
+                                            pass
+                                        else:
+                                            file_write.write(lines)
+                            except Exception as e:
+                                print("error during operetion")
+                                error_log("history",str(e))
                         elif command_file=="-over":
-                            with open(file,"r") as file_read:
-                                list_line=file_read.readlines()
-                            with open(file,"w") as file_write:
-                                for line_number,lines in enumerate(list_line):
-                                    if line_number+1==line:
-                                        file_write.write(phrase+"\n")
-                                    else:
-                                        file_write.write(lines)
+                            try:
+                                with open(file,"r") as file_read:
+                                    list_line=file_read.readlines()
+                                with open(file,"w") as file_write:
+                                    for line_number,lines in enumerate(list_line):
+                                        if line_number+1==line:
+                                            file_write.write(phrase+"\n")
+                                        else:
+                                            file_write.write(lines)
+                            except Exception as e:
+                                print("error during operetion")
+                                error_log("history",str(e))
                         elif command_file=="-append":
-                            with open(file,"r") as file_read:
-                                list_line=file_read.readlines()
-                            with open(file,"w") as file_write:
-                                for line_number,lines in enumerate(list_line):
-                                    if line_number+1==line:
-                                        input(True)
-                                        input(line_number+1)
-                                        input(line)
-                                        file_write.write(lines.strip()+" "+phrase)
-                                    else:
-                                        file_write.write(lines)            
+                            try:
+                                with open(file,"r") as file_read:
+                                    list_line=file_read.readlines()
+                                with open(file,"w") as file_write:
+                                    for line_number,lines in enumerate(list_line):
+                                        if line_number+1==line:
+                                            input(True)
+                                            input(line_number+1)
+                                            input(line)
+                                            file_write.write(lines.strip()+" "+phrase)
+                                        else:
+                                            file_write.write(lines)   
+                            except Exception as e:
+                                error_log("history",str(e))
+                                print("error during operetion")         
 
 
                 else:
@@ -1604,7 +1710,7 @@ while True:
                 elif command[0]=="srm":
                     print("same thinh of rm but more secure")
                 elif command[0]=="grep":
-                    print("find a specific word in a file\nusage grep file_name word\nparma -i for regex search -s print only line number")
+                    print("find a specific word in a file\nusage grep file_name word\nparma search -s print only line number")
                 elif command[0]=="exit":
                     print("close program")
                 elif command[0]=="down":
@@ -1647,11 +1753,47 @@ while True:
                 
 
             else:
-                print("use help -l for see all command or help <command>")    
+                print("use help -l for see all command or help <command>")
+
+        elif command[0]=="apt":
+            if os.path.exists(plugin_path) is False:
+                os.mkdir(plugin_path)
+            command.pop(0)
+            if len(command)==1:
+                file_download=command[0]
+                #DonwloadLib.download_file("https:\\site_to_donwload\\"+file_download)
+                with zipfile.ZipFile(r''+plugin_path+"\\"+file_download+".zip",'r') as zip_ref:
+                    zip_ref.extractall(plugin_path)
+                os.remove(r''+plugin_path+"\\"+file_download+".zip")
+                print("download done")
+            else:
+                print("error no file to download")
+
+        elif command[0]=="plugin":
+            command.pop(0)
+            if len(command)==1:
+                plugin_file=command[0]
+                sys.path.append(r''+plugin_path+"\\"+plugin_file)
+                filename = r''+plugin_path+"\\"+plugin_file+"\\main.py"
+                input(filename)
+                if os.path.exists(filename):
+                    try:
+                        exec(compile(open(filename, "rb").read(), filename, 'exec'), globals(), locals())
+                    except ImportError:
+                        print("error module not found")
+                        filename=r''+plugin_path+"\\"+plugin_file+"\\requirements.txt"
+                        if os.path.exists(filename):
+                            os.system(r"pip install -r "+filename)
+                        else:
+                            print("error no requirements file found")
+                    except Exception as e:
+                        error_log("history",str(e))
+                        print("unknow error")
+
 
         else:
             print("command not found")
-            x=Correttore.Correttore(["secret","hs","hy","history","sudo","pwd","protection","unprotection","wifi","cd","changedirectory","chd","md","mkd","mkdir","getsha","sha256","gtsh","get256","clear","cls","usb","more","mr","ls","listdir","lsdir","cp","copy","mv","move","rm","remove","srm","secureremove","grep","grp","gp","ex","exit","xexit","dn","down","download","mrm","multiremove","echo","pc","proc","process","en","encrypt","dc","decript","scf","search","rd","random","rnd","editfile","edf","fileedit"],1,command[0])
+            x=Correttore.Correttore(["apt","plugin","update","secret","hs","hy","history","sudo","pwd","protection","unprotection","wifi","cd","changedirectory","chd","md","mkd","mkdir","getsha","sha256","gtsh","get256","clear","cls","usb","more","mr","ls","listdir","lsdir","cp","copy","mv","move","rm","remove","srm","secureremove","grep","grp","gp","ex","exit","xexit","dn","down","download","mrm","multiremove","echo","pc","proc","process","en","encrypt","dc","decript","scf","search","rd","random","rnd","editfile","edf","fileedit"],1,command[0])
             if len(x)>1:
                 x=" ".join(x)
             else:
@@ -1672,10 +1814,14 @@ while True:
 
 
 #TODO important
-#!re-write scf command for better code e better time exectution 
 
 
 
 #TODO
-#! Aggiungere Backup programm  su drive
+#! Aggiungere where parma in ls
 #! Salvare gli errori su un file di log 
+
+
+
+
+

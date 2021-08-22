@@ -13,7 +13,7 @@
   <h3 align="center">task manager/shell in python</h3>
 
   <p align="center">
-    A simple shell for emulate a few linux command on windows with a cool design
+    A simple shell for emulate a few linux command on windows with a cool design, in rapid-shell branch you can create a batch file with py-manager syntax
     <br />
     <a href="https://github.com/Nicholas-the-Null/py-manager"><strong>Explore the docs »</strong></a>
     <br />

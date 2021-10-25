@@ -2,7 +2,10 @@ nice_conta_file=0
 test_echo_command_sha256=False
 
 #'\033[32m'
+
 import os
+
+import msvcrt
 os.system("")
 try:
     from rich.console import Console 
@@ -12,8 +15,6 @@ except ImportError:
     input('\033[31m'+"miss rich lib run first installer.py")
     exit()
 
-import os
-help_path=r''+os.getcwd()+"\\"+"help.txt"
 echo_off=os.getcwd()
 print(f"[+] success {nice_conta_file}")
 nice_conta_file+=1
@@ -69,9 +70,9 @@ try:
     nice_conta_file+=1
 
 except Exception as e:
-    print(str(e))
-    input('\033[31m'+"you miss some file please run installer.py with this code 1789")
+    input('\033[31m'+"you miss some file or file are corrupted please run installer.py with this code 1789")
     exit()
+    
 import sys
 print(f"[+] success {nice_conta_file}")
 nice_conta_file+=1
@@ -127,7 +128,8 @@ except ImportError:
 
 import zipfile
     
-input("press a key for continue")
+print("press a key to continue")
+msvcrt.getch()
 os.system('cls' if os.name=='nt' else 'clear')
 
 
@@ -151,11 +153,17 @@ usb_active=False
 console = Console()
 history=[]
 primitive_path=r'C:\\Users\\'+str(getuser())
-plugin_path=r''+os.getcwd()+"\\plugin"
-error_log_path=r''+os.getcwd()+"\\log.txt"
+
+correct_path=r''+__file__
+correct_path=correct_path[:-8]
+original_usb=os.getcwd()
+
+plugin_path=r''+correct_path+"\\plugin"
+error_log_path=r''+correct_path+"\\log.txt"
 if os.path.exists(error_log_path) is False:
     with open(error_log_path,"w+") as file:
         pass
+
 
 def diff(list1, list2):
     list_difference = [item for item in list1 if item not in list2]
@@ -166,7 +174,7 @@ def error_log(command,error):
     counter_error_passer+=1
     ora=datetime.now()
     ora=ora.strftime("%d-%b-%Y (%H:%M:%S.%f)")
-    with open(error_log_path,"a") as logs:
+    with open(error_log_path,"a",encoding="utf-8") as logs:
         logs.write("error at "+ora+" in command " + command + " with this message " + error +"\n")
     if counter_error_passer%100==0:
         print("error if you want report please send log.txt file text to https://github.com/Nicholas-the-Null/py-manager/issues")
@@ -185,7 +193,7 @@ def checkIfProcessRunning(processName):
                 return True
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
-    return False;
+    return False
 
 def is_admin():
     try:
@@ -199,6 +207,14 @@ def SetProtection():
 
 def UnsetProtection():
 	ctypes.windll.ntdll.RtlSetProcessIsCritical(0, 0, 0) == 0
+
+
+forbidden_charter_data_set={'\\':'','/':'',':':'','*':'','?':'','"':'','<':'','>':'','|':''}
+
+def forbidden_charter(text,dict=forbidden_charter_data_set):
+    for i, j in dict.items():
+        text = text.replace(i, j)
+    return text
 
 
 table = Table(title="info")
@@ -240,7 +256,7 @@ console.print("""[green]
  |_|    \__, |_|  |_|\__,_|_| |_|\__,_|\__, |\___|_|   
          __/ |                          __/ |          
         |___/                          |___/           
-""" +"[/]")
+""" +"[/green]")
 
 print("")
 
@@ -271,7 +287,7 @@ while True:
 
 
         else:
-            command=console.input("[green]"+str(echo_off)+" "+sys_type+"[/]>").split()
+            command=console.input("[green]"+str(echo_off)+" "+sys_type+"[/green]>").split()
         if "|" in command:
             found=False
             for commands in command:
@@ -317,6 +333,7 @@ while True:
                 file=command[2]
                 try:
                     if os.path.exists(file) is False:
+                        file=forbidden_charter(file)
                         x=open(file,"w+")
                         x.close()
                 except Exception as e:
@@ -326,7 +343,7 @@ while True:
                 else:commando=None
                 if commando !=None:
                     try:
-                        with open(file,commando) as f:
+                        with open(file,commando,encoding="utf-8") as f:
                             for numero,nome in enumerate(history):
                                 f.write(str(numero+1)+ " " +str(nome)+"\n")
                     except Exception as e:
@@ -354,6 +371,7 @@ while True:
         elif command[0].lower()=="sudo":
             if ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)==42:
                 exit()
+          
             
         elif command[0].lower()=="pwd":print(os.getcwd())
 
@@ -400,35 +418,41 @@ while True:
             command.pop(0)
             try:
                 directory=command[0]
+                directory_list=[]
+                try:
+                    for directoryname in os.listdir(os.getcwd()):
+                        if os.path.isdir(directoryname):
+                            directory_list.append(directoryname)
+                except:
+                    pass
                 if directory=="~":os.chdir(r'C:\\Users\\'+os.getlogin())
                 else:
                     directory=r''+directory
                     if os.path.exists(directory) is False:
                         if Confirm.ask("Do you want create a new directory?"):
                             os.mkdir(directory)
-                        else:
-                            console.print("[red]not create"+"[/]")
                     else:
                         os.chdir(directory)
-            except:
+            except Exception as e:
                 if Confirm.ask("Do you want return to home dir?"):
                     os.chdir(r'C:\\Users\\'+os.getlogin())
                 else:
-                    console.print("[red]ok"+"[/]")
+                    console.print("[red]ok"+"[/red]")
 
         elif command[0].lower() in ["md","mkd","mkdir"]: #create dir
             command.pop(0)
             if len(command)==0:
-                console.print("[red]error no name in input"+"[/]")
+                console.print("[red]error no name in input"+"[/red]")
             else:
                 if os.path.exists(command[0]):
-                    console.print("[red]error directory already exists"+"[/]")
+                    console.print("[red]error directory already exists"+"[/red]")
                 else:
                     try:
-                        os.mkdir(command[0])
+                        file_name=forbidden_charter(command[0])
+                        os.mkdir(file_name)
                     except Exception as e:
                         print(str(e))
-                        error_log("history",str(e))
+                        error_log("mkd",str(e))
 
         elif command[0].lower() in ["getsha","sha256","gtsh","get256"]: #sha256 of file or string
             command.pop(0)
@@ -460,7 +484,7 @@ while True:
                             x.close()
                         except Exception as e:
                             print("error during file writing")
-                            error_log("history",str(e))
+                            error_log("cls",str(e))
                     elif command[0].startswith("history"):
                         if command[0]=="history":
                             history=[]
@@ -504,7 +528,7 @@ while True:
                                 history=lista_app
 
                             except Exception as e:
-                                error_log("history",str(e))
+                                error_log("cls",str(e))
                                 pass
 
                 else:
@@ -608,7 +632,7 @@ while True:
                 if os.path.exists(command[0]):
                     try:
                         if len(command)==1:
-                            with open(command[0],'r') as Read_file:
+                            with open(command[0],'r',encoding="utf-8") as Read_file:
                                 file_contenent=Read_file.readlines()
                             number_line_conta=0
                             for number_line,line in enumerate(file_contenent):
@@ -624,7 +648,7 @@ while True:
                             if command[1].lower()=="-tail":
                                 number=10
                                 if not len(command)==2:number=int(command[2])
-                                with open(command[0],'r') as Read_file:
+                                with open(command[0],'r',encoding="utf-8") as Read_file:
                                     file_contenent=Read_file.readlines()
 
                                 num_lines = sum(1 for line in open(command[0]))
@@ -645,7 +669,7 @@ while True:
                             elif command[1].lower()=="-head":
                                 number=10
                                 if not len(command)==2:number=int(command[2])
-                                with open(command[0],'r') as Read_file:
+                                with open(command[0],'r',encoding="utf-8") as Read_file:
                                     file_contenent=Read_file.readlines()
                                 for number_line,line in enumerate(file_contenent):
                                     if number_line==number:break
@@ -654,27 +678,61 @@ while True:
 
 
                             else:
-                                console.print(f"[red]error parma {command[1]} not found"+"[/]")
+                                console.print(f"[red]error parma {command[1]} not found"+"[/red]")
 
                     except Exception as e:
-                        console.print("[red]error i cant read file"+"[/]")
-                        error_log("history",str(e))
+                        console.print("[red]error i cant read file"+"[/red]")
+                        error_log("more",str(e))
                 else:
-                    console.print("[red]error file not found"+"[/]")
+                    console.print("[red]error file not found"+"[/red]")
 
             else:
-                console.print("[red]error no file in input"+"[/]")
+                console.print("[red]error no file in input"+"[/red]")
 
 
         elif command[0].lower() in ["ls","listdir","lsdir"]: #ls command print all file in a dir -l for long description -a for include all subdir and his file
             command.pop(0)#parma
             interupt=False
+            parameter=None
+            output_ls=True
+            checker=5
+            if len(command)==5:checker=4
             if not len(command)==0:
                 if os.path.exists(command[0]) and os.path.isdir(command[0]):
                     directory=command[0]
                     command.pop(0)
                 else:
                     directory=os.getcwd()
+                if "where" in command:
+                    pos=command.index("where")
+                    if pos!=len(command)-1:
+
+                        parameter=command[pos+1]
+                        if parameter not in ["&dir","&file","&read","&write","&type","&size"]:
+                            parameter=None
+                            command.pop(pos)
+                        else:
+                            
+                            if parameter=="&size":
+                                if len(command)-1>=checker:
+                                    typus=[command[pos+2],command[pos+3]]
+                                    command.pop(pos)
+                                    command.pop(pos)
+                                else:
+                                    parameter=None
+                                    typus=[None,"None"]
+
+                            if parameter=="&type":
+                                if pos+1!=len(command)-1:
+                                    typus=command[pos+2]
+                                    command.pop(pos)
+                                else:
+                                    typus=None
+                            command.pop(pos)
+                            command.pop(pos)
+                    else:
+                        parameter=None
+                        command.pop(pos)
                 if not len(command)==0:
                     if len(command)==2 and (command==["-a","-l"] or command==["-l","-a"]):
                         table=Table(title="file")
@@ -699,12 +757,50 @@ while True:
                                             tempo=tempo.strftime("%d:%m:%y")
                                             is_dir=str(os.path.isdir(nome))
                                             is_dir=is_dir[0]
-                                            size=str(round(os.path.getsize(nome)/(1024*1024),3))
+                                            size=str(round(os.path.getsize(nome)/(1024),3))
                                             read=str(os.access(nome,os.R_OK))[0]
                                             write=str(os.access(nome,os.W_OK))[0]
-                                            table.add_row(str(numero),str(GetShortPathName(path)),is_dir,size,tempo,read,write)
-                                            numero+=1
+
+                                            if parameter!=None:
+                                               
+
+                                                if (parameter=="&size" and typus[0]!=None) and (typus[0] in [">",">=","<=","<","=="] and typus[1].isnumeric()):
+                                                    if typus[0]==">" and int(float(size)) > int(typus[1]):
+                                                        output_ls=True
+                                                    
+                                                    elif typus[0]==">=" and int(float(size))>=int(typus[1]):
+                                                        output_ls=True
+                                            
+                                                    elif typus[0]=="<" and int(typus[1])>int(float(size)):
+                                                        output_ls=True
+                                                    elif typus[0]=="<=" and int(typus[1]) >= int(float(size)):
+                                                        output_ls=True
+                                                    
+                                                    elif typus[0]=="==" and int(typus[1]) == int(float(size)):
+                                                        output_ls=True
+                                                    
+                                                    else:
+                                                        output_ls=False
+                                                    
+
+
+
+                                                if parameter=="&type" and typus!=os.path.splitext(nome)[1]:
+                                                    output_ls=False
+                                                if parameter=="&read" and read=="T":
+                                                    output_ls=False
+                                                if parameter=="&write" and write=="T":
+                                                    output_ls=False
+                                                if output_ls==True:
+                                                    table.add_row(str(numero),str(GetShortPathName(nome)),is_dir,size,tempo,read,write)
+                                                    numero+=1
+                                                if output_ls==False:
+                                                    output_ls=True
+                                            else:
+                                                table.add_row(str(numero),str(GetShortPathName(nome)),is_dir,size,tempo,read,write)
+                                                numero+=1
                                         except (Exception,KeyboardInterrupt) as e:
+                                            print(e)
                                             if str(e)=="":
                                                 interupt=True
                                                 break
@@ -715,7 +811,7 @@ while True:
                         try:
                             if interupt==False:
                                 console.print(table)
-                        except:pass
+                        except :pass
 
 
                     elif command[0]=="-l":
@@ -728,6 +824,7 @@ while True:
                         table.add_column("read",style="yellow")
                         table.add_column("write",style="#008B8B")
                         
+                        
                         try:
                             for numero,nome in enumerate(os.listdir(directory)):
                                 if interupt==True:
@@ -739,12 +836,50 @@ while True:
                                     tempo=tempo.strftime("%d:%m:%y")
                                     is_dir=str(os.path.isdir(nome))
                                     is_dir=is_dir[0]
-                                    size=str(round(os.path.getsize(nome)/(1024*1024),3))
+                                    size=str(round(os.path.getsize(nome)/(1024),3))
                                     read=str(os.access(nome,os.R_OK))[0]
                                     write=str(os.access(nome,os.W_OK))[0]
 
-                                    table.add_row(str(numero),nome1,is_dir,size,tempo,read,write)
+                                    if parameter!=None:
+                                        if (parameter=="&size" and typus[0]!=None) and (typus[0] in [">",">=","<=","<","=="] and typus[1].isnumeric()):
+                                            if typus[0]==">" and int(float(size)) > int(typus[1]):
+                                                output_ls=True
+                                            
+                                            elif typus[0]==">=" and int(float(size))>=int(typus[1]):
+                                                output_ls=True
+                                    
+                                            elif typus[0]=="<" and int(typus[1])>int(float(size)):
+                                                output_ls=True
+                                            elif typus[0]=="<=" and int(typus[1]) >= int(float(size)):
+                                                output_ls=True
+                                            
+                                            elif typus[0]=="==" and int(typus[1]) == int(float(size)):
+                                                output_ls=True
+                                            
+                                            else:
+                                                output_ls=False
+                                        if parameter=="&type" and typus!=os.path.splitext(nome)[1]:
+                                            output_ls=False
+                                        if parameter=="&dir" and is_dir=="T":
+                                            output_ls=False
+                                        if parameter=="&file" and is_dir=="F":
+                                            output_ls=False
+                                        if parameter=="&read" and read=="F":
+                                            output_ls=False
+                                        if parameter=="&write" and write=="F":
+                                            output_ls=False
+                                        if output_ls==True:
+                                            table.add_row(str(numero),str(GetShortPathName(nome)),is_dir,size,tempo,read,write)
+                                            numero+=1
+                                        else:
+                                            output_ls=True
+                                    else:
+                                        
+                                        table.add_row(str(numero),str(GetShortPathName(nome)),is_dir,size,tempo,read,write)
+                                        numero+=1
+
                                 except (Exception,KeyboardInterrupt) as e:
+                                    print(e)
                                     if str(e)=="":
                                         interupt=True
                                         break
@@ -779,7 +914,7 @@ while True:
                         except:pass
 
                     else:
-                        console.print(f"[red]error parma are wrong "  +"[/]")
+                        console.print(f"[red]error parma are wrong "  +"[/red]")
                 else:
                     table=Table(title="file")
                     table.add_column("name",style="magenta")
@@ -814,7 +949,16 @@ while True:
                 except:pass
 
 
-
+        elif command[0]=="chmod":
+            command.pop(0)
+            if len(command)==2:
+                try:
+                    os.chmod(command[0],int(command[1]))
+                except Exception as e:
+                    print(e)
+            else:
+                print("error")
+                
         elif command[0].lower() in ["cp","copy"]: #copy file in another dir
             command.pop(0)
             if len(command)>1:
@@ -832,12 +976,12 @@ while True:
                                     ver=True                           
                         if ver==False:shutil.copyfile(command[0],command[1])
                     except Exception as e:
-                        console.print("[red]error i cant create new file "+str(e)+"[/]")
-                        error_log("history",str(e))
+                        console.print("[red]error i cant create new file "+str(e)+"[/red]")
+                        error_log("cp",str(e))
                 else:
-                    console.print("[red]file not found"+"[/]")
+                    console.print("[red]file not found"+"[/red]")
             else:
-                console.print("[red]not parma in input"+"[/]")
+                console.print("[red]not parma in input"+"[/red]")
 
 
         elif command[0].lower() in ["mv","move"]: #move file in another folder
@@ -851,65 +995,93 @@ while True:
                         try:
                             shutil.move(command[0],command[1])
                         except Exception as e:
-                            console.print("[red]error i cant create new file "+str(e)+"[/]")
-                            error_log("history",str(e))
+                            console.print("[red]error i cant create new file "+str(e)+"[/red]")
+                            error_log("move",str(e))
                     else:
-                        console.print("[red]file not found"+"[/]")
+                        console.print("[red]file not found"+"[/red]")
                 else:
-                    console.print("[red]file not found"+"[/]")
+                    console.print("[red]file not found"+"[/red]")
             else:
-                console.print("[red]not parma in input"+"[/]")
+                console.print("[red]not parma in input"+"[/red]")
 
         elif command[0].lower() in ["rm","remove"]: #remove file
             command.pop(0)
-            if len(command)==1:
-                if command[0]=="-a":
-                    for x in os.listdir():
-                        if os.path.isdir(x) is False:os.remove(x)
+            path_command=os.getcwd()
+            for x in command:
+                if x=="$":
+                    path_command=os.getcwd()
+                    break
+                if x.startswith("$"):
+                    path_command=x
+                    path_command=path_command.replace("$","")
+            if path_command!=os.getcwd():
+                command.remove("$"+path_command)
+            if os.path.isdir(path_command):
+                pass
+            else:
+                if os.path.exists(r''+os.getcwd()+"\\"+path_command):
+                    path_command=r''+os.getcwd()+"\\"+path_command
                 else:
-                    if os.path.exists(command[0]) and os.path.isdir(command[0]) is False:
-                        os.remove(command[0])
+                    print("path not found")
+                    command=["paass"]
+            if len(command)>0:
+                for parma in command:
+                    if parma=="*":
+                        for x in os.listdir(path_command):
+                            try:
+                                if os.path.isdir(r''+path_command+"\\"+x):
+                                    shutil.rmtree(x,ignore_errors=True)
+                                else:
+                                    os.remove(r''+path_command+"\\"+x)
+                            except Exception as e:
+                                print(f"i cant remove this file {x} for this reason {e} ")
+
+                    elif parma.startswith("*"):
+                        #if start with parma delete file
+                        parma=parma.replace("*","")
+                        for x in os.listdir(path_command):
+                            if x.startswith(parma):
+                                try:
+                                    if os.path.isdir(r''+path_command+"\\"+x):pass
+                                    else:os.remove(r''+path_command+"\\"+x)
+                                except Exception as e:
+                                    print(f"i cant remove this file {x} for this reason {e} ")
+                    elif parma.endswith("*"):
+                        #if end with parma no ext delete file
+                        parma=parma.replace("*","")
+                        for x in os.listdir(path_command):
+                            filename= os.path.splitext(x)[0]
+                            if filename.endswith(parma):
+                                try:
+                                    if os.path.isdir(r''+path_command+"\\"+x):pass
+                                    else:os.remove(r''+path_command+"\\"+x)
+                                except Exception as e:
+                                    print(f"i cant remove this file {x} for this reason {e} ")
                     else:
-                        print("error i cant delete element")
-            elif len(command)==2:
-                path=command[0]
-                parma=command[1]
-                if path=="-a" and parma=="-d":
-                    for x in os.listdir():
-                        if os.path.isdir(x):
-                            shutil.rmtree(x,ignore_errors=True)
-                            #os.rmdir(x)
+                        if os.path.isfile(parma):
+                            try:
+                                os.remove(parma)
+                            except Exception:
+                                print("error i cant remove file")
+                        elif os.path.isdir(parma):
+                            if "-d" in command:
+                                shutil.rmtree(parma,ignore_errors=True)
+                            else:
+                                for x in os.listdir(parma):
+                                    path=r''+parma+"\\"+x
+                                    try:
+                                        if os.path.isfile(path):
+                                            os.remove(path)
+                                        else:
+                                            parma
+                                    except Exception as e:
+                                        pass
                         else:
-                            os.remove(x)
-
-                elif os.path.exists(path) and os.path.isdir(path) and parma=="-d":
-                    shutil.rmtree(path,ignore_errors=True)
-                    if os.getcwd()!=path:
-                        os.rmdir(path)
-
-                elif os.path.exists(path) and os.path.isdir(path) and parma=="-a":
-                    for x in os.listdir(path):
-                        if os.path.isdir(r''+path+'\\'+x) is False:os.remove(r''+path+'\\'+x)
-                else:
-                    print("error ")
-
-            elif len(command)==3:
-                path=command[0]
-                parma1=command[1]
-                parma2=command[2]
-                if os.path.exists(path) and os.path.isdir(path) and ((parma1=="-a" and parma2=="-d") or (parma1=="-d" or parma2=="-a")):
-                    for x in os.listdir(path):
-                        if os.path.isdir(r''+path+'\\'+x) is False:os.remove(r''+path+'\\'+x)
-                        else:
-                            shutil.rmtree(r''+path+'\\'+x,ignore_errors=True)
-                            #os.rmdir(r''+path+'\\'+x)
-                    if os.getcwd()!=path:
-                        os.rmdir(path)
-                else:
-                    print("error")
-
-
-
+                            if os.path.isdir(r''+os.getcwd()+"\\"+parma):
+                                if "-d" in command:
+                                    shutil.rmtree(parma,ignore_errors=True)
+                            else:
+                                pass
             else:
                 print("error command wrong")
 
@@ -938,7 +1110,7 @@ while True:
                         console.print(table)
                     except Exception as e:
                         print("error "+str(e))
-                        error_log("history",str(e))
+                        error_log("info",str(e))
                 else:
                     print("error file not dound or is a dir")
             else:
@@ -956,9 +1128,9 @@ while True:
                     main.asset.secure.cripta.Delete_File(command[0])
                     os.remove(command[0])
                 else:
-                    console.print("[red]file not found"+"[/]")
+                    console.print("[red]file not found"+"[/red]")
             else:
-                console.print("[red]not parma in input"+"[/]")
+                console.print("[red]not parma in input"+"[/red]")
 
         elif command[0].lower() in ["grep","grp","gp"]: #print line where a string parma -i for regex use and -s for print only number of line parma -i first
             command.pop(0)
@@ -967,24 +1139,50 @@ while True:
                 if os.path.exists(command[0]) and os.path.isdir(command[0])==False:
                     if not len(command)==1:
                         parola=command[1]
+                        if parola=="%email%":
+                            parola="""(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"""
+                        elif parola=="%ipv4%":
+                            parola="""'\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}\b'"""
                         regex=re.compile(r''+parola)                  
-                        with open(command[0],"r") as file:
+                        with open(command[0],"r",encoding="utf-8") as file:
                             filee=file.readlines()
                         for line in filee:
                             if regex.search(line):
                                 if "-s" not in command:
-                                    print(str(count) + " "+ line.strip())
+                                    #print(str(count) + " "+ line.strip())
+                                    stringa_completa="" 
+                                    line_list=line.split()
+                                    for x in line_list:
+                                        if regex.search(x) is not None:
+                                            x="[red]"+x+"[/red]"
+                                        else:
+                                            x="[grey]"+x+"[/grey]"
+                                        x=x.replace("'","")
+                                        stringa_completa+=x+" "
+                                    if stringa_completa=="":
+                                        stringa_completa=line
+                                    try:
+                                        console.print(str(count)+" "+stringa_completa.replace("\n",""))
+                                    except:
+                                        stringa_completa=stringa_completa.replace("[grey]","")
+                                        stringa_completa=stringa_completa.replace("[/grey]","")
+                                        stringa_completa=stringa_completa.replace("[red]","")
+                                        stringa_completa=stringa_completa.replace("[/red]","")
+                                        print(str(count)+" "+stringa_completa.replace("\n",""))
+
+
+
                                 count+=1
                         print("count " + str(count))
 
                     else:
-                        console.print("[red]not parma in input"+"[/]")
+                        console.print("[red]not parma in input"+"[/red]")
 
                 else:
-                    console.print("[red]file not found"+"[/]")
+                    console.print("[red]file not found"+"[/red]")
             except Exception as e:
                 print("error in regx read")
-                error_log("history",str(e))
+                error_log("grep",str(e))
         
         elif command[0] in ["ex","exit","xexit"]:
             if Confirm.ask("Do you want exit?"):
@@ -993,53 +1191,88 @@ while True:
                 exit()
             else:
                 pass
+        elif command[0]=="sleep":
+            command.pop(0)
+            if len(command)>0:
+                try:
+                    timer_sleep=int(command[0])
+                    time.sleep(timer_sleep)
+
+                except ValueError:
+                    print("requires a number")
+            else:
+                pass
 
         elif command[0] in ["dn","down","download"]:
-            #! tipo download sito cartella  
+            #! tipo download sito cartella 
+            name=None 
+            path=None
             original=os.getcwd()
             command.pop(0)
             if not len(command)==0:
                 if command[0]=="-file":
                     command.pop(0)
-                    if not len(command)==0:
-                        if len(command)==2:
-                            if os.path.exists(command[1]):os.chdir(command[1])
-                            else:console.print("[red]error dir not found"+"[/]")
-                        result=DonwloadLib.download_file(command[0])
-                        
-                        if not result=="Success":console.print(result)
-                        os.chdir(original)
-                        
+                    #link path -name name 
+                    if len(command)!=0:
+                        link=command[0]
+                        command.pop(0)
+                        if len(command)!=0:
+                            if os.path.exists(command[0]) and os.path.isdir(command[0]):
+                                path=command[0]
+                                os.chdir(path)
+                                command.pop(0)
+                            elif command[0]=="-name":
+                                path=None
+                                pass
+                            else:
+                                print("error path not found")
+                                path=None
+                            if command[0]=="-name" and len(command)==2:
+                                name=command[1]
+                            else:
+                                name=None
+
+                        result=DonwloadLib.download_file(link)
+                        if result[0]=="success":
+                            if name!=None:
+                                try:
+                                    os.rename(result[1],name)
+                                except Exception:
+                                    print("Error name not valid")
+                            if path!=None:
+                                os.chdir(original)
+                        else:
+                            console.print(result)
                     else:
-                        console.print("[red]error parma dont match"+"[/]")
+                        console.print("[red]error parma dont match"+"[/red]")
 
                 elif command[0]=="-site-js":
                     command.pop(0)
                     if not len(command)==0:
                         if len(command)==2:
                             if os.path.exists(command[1]):os.chdir(command[1])
-                            else:console.print("[red]error dir not found"+"[/]")
+                            else:console.print("[red]error dir not found"+"[/red]")
                         result=DonwloadLib.js(command[0])
                         
                         if not result=="Success":console.print(result)
                         os.chdir(original)
                         
                     else:
-                        console.print("[red]error parma dont match"+"[/]")
+                        console.print("[red]error parma dont match"+"[/red]")
 
                 elif command[0]=="-site-css":
                     command.pop(0)
                     if not len(command)==0:
                         if len(command)==2:
                             if os.path.exists(command[1]):os.chdir(command[1])
-                            else:console.print("[red]error dir not found"+"[/]")
+                            else:console.print("[red]error dir not found"+"[/red]")
                         result=DonwloadLib.css(command[0])
                         
                         if not result=="Success":console.print(result)
                         os.chdir(original)
                         
                     else:
-                        console.print("[red]error parma dont match"+"[/]")
+                        console.print("[red]error parma dont match"+"[/red]")
 
 
 
@@ -1048,7 +1281,7 @@ while True:
                     if not len(command)==0:
                         if len(command)==2:
                             if os.path.exists(command[1]):os.chdir(command[1])
-                            else:console.print("[red]error dir not found"+"[/]")
+                            else:console.print("[red]error dir not found"+"[/red]")
                         
                         
                         letters = string.ascii_lowercase
@@ -1062,21 +1295,22 @@ while True:
                         os.chdir(original)
                         
                     else:
-                        console.print("[red]error parma dont match"+"[/]")
+                        console.print("[red]error parma dont match"+"[/red]")
 
 
                 else:
-                    console.print("[red]error parma dont match"+"[/]")
+                    console.print("[red]error parma dont match"+"[/red]")
 
                         
 
             else:
-                console.print("[red]error no parma in input "+"[/]")
+                console.print("[red]error no parma in input "+"[/red]")
             pass
         
 
         elif command[0] in ["mrm","multiremove"]:
-            #comando path metodo_eliminzaione modalità altro 
+            #sistemare eccezione per file non eliminabuli
+            
             original=os.getcwd()
             command.pop(0)
             if len(command)!=0:
@@ -1107,7 +1341,7 @@ while True:
                                     else:discrimina=False
                                     file_list=multi_delete.delete_ext(est,discrimina)
                                 else:
-                                    console.print("[red]you miss parma in input "+"[/]")
+                                    console.print("[red]you miss parma in input "+"[/red]")
                                     file_list=[]
 
                             elif command[0]=="-name":
@@ -1123,7 +1357,7 @@ while True:
                             
 
                                 else:
-                                    console.print("[red]you miss parma in input "+"[/]")
+                                    console.print("[red]you miss parma in input "+"[/red]")
                                     file_list=[]
 
                             elif command[0]=="-size":
@@ -1138,18 +1372,18 @@ while True:
                                                 discrimina=command[0]
                                                 file_list=multi_delete.delete_size(size,discrimina)
                                             else:
-                                                console.print("[red]your parma are wrong "+"[/]")
+                                                console.print("[red]your parma are wrong "+"[/red]")
                                                 file_list=[]
                                         else:
-                                            console.print("[red]you miss parma in input "+"[/]")
+                                            console.print("[red]you miss parma in input "+"[/red]")
                                             file_list=[]
                                     except ValueError:
-                                        console.print("[red]your parma are wrong "+"[/]")
+                                        console.print("[red]your parma are wrong "+"[/red]")
                                         file_list=[]
 
 
                                 else:
-                                    console.print("[red]you miss parma in input "+"[/]")
+                                    console.print("[red]you miss parma in input "+"[/red]")
                                     file_list=[]
 
 
@@ -1159,7 +1393,7 @@ while True:
                                     
                                     
                         else:
-                            console.print("[red]error no parma in input "+"[/]")
+                            console.print("[red]error no parma in input "+"[/red]")
                             os.chdir(original)
 
 
@@ -1168,11 +1402,17 @@ while True:
                         if len(file_list)!=0:
                             for element in file_list:
                                 if sicuro==True:
-                                    main.asset.secure.cripta.Delete_File(element)
-                                os.remove(element)
+                                    try:
+                                        main.asset.secure.cripta.Delete_File(element)
+                                    except Exception:
+                                        pass
+                                try:
+                                    os.remove(element)
+                                except Exception:
+                                    pass
                             os.chdir(original)
                         else:
-                            console.print("[red]no file to delete "+"[/]")
+                            console.print("[red]no file to delete "+"[/red]")
                             os.chdir(original)
 
                         
@@ -1186,16 +1426,16 @@ while True:
 
 
                     else:
-                        console.print("[red]error no parma in input "+"[/]")
+                        console.print("[red]error no parma in input "+"[/red]")
                         os.chdir(original)
 
 
 
                 else:
-                    console.print(f"[red]error {command[0]} dir not found "+"[/]")
+                    console.print(f"[red]error {command[0]} dir not found "+"[/red]")
                     os.chdir(original)
             else:
-                console.print("[red]error no parma in input "+"[/]")
+                console.print("[red]error no parma in input "+"[/red]")
             
     
 
@@ -1225,7 +1465,7 @@ while True:
                             under_string=str(under_string.strftime(formatto))
                         except Exception as e:
                             print(e)
-                            error_log("history",str(e))
+                            error_log("echo",str(e))
                             under_string=str(datetime.now())
                     
                     if under_string=="%pwd":under_string=str(os.getcwd())
@@ -1245,17 +1485,18 @@ while True:
                 else:
 
                     if len(command)<save_number+2:
-                        console.print("[red]error miss parma "+"[/]")
+                        console.print("[red]error miss parma "+"[/red]")
                     else:
                         try:
                             if command[save_number]==">":
-                                with open(command[save_number+1],'w+') as file:
+                                file_name=forbidden_charter(command[save_number+1])
+                                with open(file_name,'w+',encoding="utf-8") as file:
                                     file.write(out)
                             else:
-                                with open(command[save_number+1],'a') as file:
+                                with open(file_name,'a',encoding="utf-8") as file:
                                     file.write("\n"+out)
                         except:
-                            console.print("[red]error invalid file name "+"[/]")
+                            console.print("[red]error invalid file name "+"[/red]")
 
 
 
@@ -1270,10 +1511,10 @@ while True:
                                 subprocess.call("taskkill /F /IM " + command[0])
                             except Exception as e:
                                 print("error "+str(e))
-                                error_log("history",str(e))
+                                error_log("pc",str(e))
                         else:pass
                     else:
-                        console.print("[red]error no parma [/]")
+                        console.print("[red]error no parma [/red]")
                 if command[0] in ["-ch","-check","-ck"]:
                     command.pop(0)
                     if len(command)!=0:
@@ -1282,7 +1523,7 @@ while True:
                         else:
                             print("not running")
                     else:
-                        console.print("[red]error no parma [/]")
+                        console.print("[red]error no parma [/red]")
 
                 elif command[0] in ["-all","-l"]:
                     table=Table(title="process")
@@ -1319,7 +1560,7 @@ while True:
                     console.print(table)
 
             else:
-                console.print("[red]error no parma [/]")
+                console.print("[red]error no parma [/red]")
         
 
 
@@ -1329,6 +1570,7 @@ while True:
         elif command[0] in ["en","encrypt"]:
             command.pop(0)
             'parma file'
+            
             if len(command)==1:
                 if os.path.exists(command[0]):
                     bufferSize = 1024 * 1024
@@ -1342,16 +1584,23 @@ while True:
                                         pyAesCrypt.encryptStream(fIn, fOut, password, bufferSize)
                                 main.asset.secure.cripta.Delete_File(file)
                                 os.remove(file)
+                
 
                     else:
-                        with open(command[0], "rb") as fIn:
-                            password=getpass(f"give me the password of file {command[0]}")
-                            with open(command[0]+"AES", "wb") as fOut:
-                                pyAesCrypt.encryptStream(fIn, fOut, password, bufferSize)
-                        main.asset.secure.cripta.Delete_File(command[0])
-                        
-                        os.remove(command[0])
-
+                        check=True
+                        if command[0][len(command[0])-3:]=="AES":
+                            sure=input("this file syntax match with our encrypt style are you sure y wanna encrypt again?[y/other]").lower()
+                            if sure=="n":
+                                check=False
+                        if check==True:
+                            with open(command[0], "rb") as fIn:
+                                password=getpass(f"give me the password of file {command[0]}")
+                                with open(command[0]+"AES", "wb") as fOut:
+                                    pyAesCrypt.encryptStream(fIn, fOut, password, bufferSize)
+                            main.asset.secure.cripta.Delete_File(command[0])
+                            
+                            os.remove(command[0])
+                            
 
                 else:
                     print("path not found")
@@ -1365,6 +1614,7 @@ while True:
                         
         elif command[0] in ["dc","decript"]:
             command.pop(0)
+            delete=None
             if len(command)==1:
                 if os.path.exists(command[0]):
                     bufferSize = 1024 * 1024
@@ -1380,13 +1630,16 @@ while True:
                                             with open(file+"decriptato."+estensione, "wb") as fOut:
                                                 try:
                                                     pyAesCrypt.decryptStream(fIn, fOut, password, bufferSize, encFileSize)
+                                                    delete=True
                                                 except Exception as e:
                                                     print("password wrong")
-                                                    error_log("history",str(e))
+                                                    error_log("decript",str(e))
                                         except ValueError:
                                             os.remove(file+"decriptato"+estensione)
                                     try:
-                                        os.remove(file)
+                                        
+                                        if delete==True:
+                                            os.remove(file)
                                     except:
                                         pass
                     else:
@@ -1399,12 +1652,18 @@ while True:
                                     try:
                                         pyAesCrypt.decryptStream(fIn, fOut, password, bufferSize, encFileSize)
                                     except Exception as e:
+                                        delete=True
                                         print("password wrong")
-                                        error_log("history",str(e))
+                                        error_log("decript",str(e))
+                                        if os.path.exists(command[0]+"decriptato"+estensione):
+                                            os.remove(command[0]+"decriptato"+estensione)
+                                        
                             except ValueError:
-                                os.remove(command[0]+"decriptato"+estensione)
+                                if os.path.exists(command[0]+"decriptato"+estensione):
+                                    os.remove(command[0]+"decriptato"+estensione)
                         try:
-                            os.remove(command[0])
+                            if delete==True:
+                                os.remove(file)
                         except:
                             pass
 
@@ -1490,7 +1749,7 @@ while True:
                                                         search.append(nome)
                                                         break
                                         except Exception as e:
-                                            error_log("history",str(e))
+                                            error_log("scf",str(e))
                                             pass
                         else:
                             for x in os.listdir(path):
@@ -1522,7 +1781,7 @@ while True:
                                                     search.append(r''+path+"\\"+x)
                                                     break
                                     except Exception as e:
-                                        error_log("history",str(e))
+                                        error_log("scf",str(e))
                                         pass
 
                         search=list(set(search))
@@ -1543,7 +1802,7 @@ while True:
                                                 break
 
                                 except Exception as e:
-                                    error_log("history",str(e))
+                                    error_log("scf",str(e))
                                     pass
 
                         if checker==True:
@@ -1568,9 +1827,9 @@ while True:
                 command.pop(0)
                 if os.path.exists(file):
                     try:
-                        num_lines = sum(1 for line in open(file))
+                        num_lines = sum(1 for line in open(file,encoding="utf-8"))
                     except Exception as e:
-                        error_log("history",str(e))
+                        error_log("edf",str(e))
                         print("error during file read ")
 
                         number_line=0
@@ -1586,20 +1845,23 @@ while True:
                             phrase=" ".join(command)
                         if command_file=="-read":
                             try:
-                                with open(file,"r") as file_read:
+                                with open(file,"r",encoding="utf-8") as file_read:
                                     for line_number, lines in enumerate(file_read):
                                         if line==line_number+1:
-                                            print(lines)
+                                            if lines=="\n":
+                                                pass
+                                            else:
+                                                print(lines)
                                             break
                             except Exception as e:
-                                error_log("history",str(e))
+                                error_log("edf",str(e))
                                 print("error during operetion")
                         elif command_file=="-getline":print(num_lines)
                         elif command_file=="-delete":
                             try:
-                                with open(file,"r") as file_read:
+                                with open(file,"r",encoding="utf-8") as file_read:
                                     list_line=file_read.readlines()
-                                with open(file,"w") as file_write:
+                                with open(file,"w",encoding="utf-8") as file_write:
                                     for line_number,lines in enumerate(list_line):
                                         if line_number+1==line:
                                             pass
@@ -1607,12 +1869,12 @@ while True:
                                             file_write.write(lines)
                             except Exception as e:
                                 print("error during operetion")
-                                error_log("history",str(e))
+                                error_log("edf",str(e))
                         elif command_file=="-over":
                             try:
-                                with open(file,"r") as file_read:
+                                with open(file,"r",encoding="utf-8") as file_read:
                                     list_line=file_read.readlines()
-                                with open(file,"w") as file_write:
+                                with open(file,"w",encoding="utf-8") as file_write:
                                     for line_number,lines in enumerate(list_line):
                                         if line_number+1==line:
                                             file_write.write(phrase+"\n")
@@ -1620,22 +1882,19 @@ while True:
                                             file_write.write(lines)
                             except Exception as e:
                                 print("error during operetion")
-                                error_log("history",str(e))
+                                error_log("edf",str(e))
                         elif command_file=="-append":
                             try:
-                                with open(file,"r") as file_read:
+                                with open(file,"r",encoding="utf-8") as file_read:
                                     list_line=file_read.readlines()
-                                with open(file,"w") as file_write:
+                                with open(file,"w",encoding="utf-8") as file_write:
                                     for line_number,lines in enumerate(list_line):
                                         if line_number+1==line:
-                                            input(True)
-                                            input(line_number+1)
-                                            input(line)
                                             file_write.write(lines.strip()+" "+phrase)
                                         else:
                                             file_write.write(lines)   
                             except Exception as e:
-                                error_log("history",str(e))
+                                error_log("edf",str(e))
                                 print("error during operetion")         
 
 
@@ -1742,6 +2001,16 @@ while True:
                     print("usage command + parma + line + text")
                     print("parma:\n-read\n-delete\n-over\n-append")
                     print("-geline get line number\n -reed read the specif line\n-delete delete the specif line\n-over over write the specif line\n-append add text at the end of the line")
+                elif command[0]=="apt":
+                    print("install a plugin usage apt link_plugin")
+                elif command[0]=="plugin":
+                    print("use a installed plugib usage plugin plugin_name")
+                elif command[0]=="track":
+                    print("parma ip address")
+                    print("track ip")
+                elif command[0]=="cat":
+                    print("concatenete two file usage cat file1 file2")
+                    print("parma you can use file3 for concatene text in a single file if you use file 3 you can use -duplicate for not add duplicate sentence")
                 else:
                     print("error no command maybe is a allias")
 
@@ -1771,29 +2040,159 @@ while True:
 
         elif command[0]=="plugin":
             command.pop(0)
-            if len(command)==1:
+            if len(command)>=1:
                 plugin_file=command[0]
-                sys.path.append(r''+plugin_path+"\\"+plugin_file)
-                filename = r''+plugin_path+"\\"+plugin_file+"\\main.py"
-                input(filename)
-                if os.path.exists(filename):
-                    try:
-                        exec(compile(open(filename, "rb").read(), filename, 'exec'), globals(), locals())
-                    except ImportError:
-                        print("error module not found")
-                        filename=r''+plugin_path+"\\"+plugin_file+"\\requirements.txt"
-                        if os.path.exists(filename):
-                            os.system(r"pip install -r "+filename)
-                        else:
-                            print("error no requirements file found")
-                    except Exception as e:
-                        error_log("history",str(e))
-                        print("unknow error")
+                if plugin_file=="-list":
+                    for file in os.listdir(plugin_path):
+                        if os.path.isdir(r''+plugin_path+"\\"+plugin_file):
+                            print(file)
+                elif plugin_file=="-hash":
+                    if len(command)>=2:
+                        sys.path.append(r''+plugin_path+"\\"+command[1])
+                        filename = r''+plugin_path+"\\"+command[1]+"\\main.py"
+                        print(main.asset.secure.file_sha256.File_calcolatore_sha256(filename))
 
+                    else:
+                        print("no file in input")
+                elif plugin_file=="-remove":
+                    if len(command)>=2:
+                        sys.path.append(r''+plugin_path+"\\"+command[1])
+                        filename = r''+plugin_path+"\\"+command[1]
+                        shutil.rmtree(filename,ignore_errors=True)
+                        
+                        
+
+                    else:
+                        print("no file in input")
+                else:
+                    sys.path.append(r''+plugin_path+"\\"+plugin_file)
+                    filename = r''+plugin_path+"\\"+plugin_file+"\\main.py"
+                    if os.path.exists(filename):
+                        try:
+                            exec(compile(open(filename, "rb").read(), filename, 'exec'), globals(), locals())
+                        except ImportError:
+                            print("error module not found")
+                            filename=r''+plugin_path+"\\"+plugin_file+"\\requirements.txt"
+                            if os.path.exists(filename):
+                                os.system(r"pip install -r "+filename)
+                            else:
+                                print("error no requirements file found")
+                        except Exception as e:
+                            error_log("history",str(e))
+                            print("unknow error")
+        elif command[0]=="track":
+            command.pop(0)
+            if len(command)>=1:
+                ip=command[0]
+                link="http://ip-api.com/json/"+ip
+                response=requests.get(link)
+                if response.status_code==200:
+                    response=response.json()
+                    if response["status"]=="success":
+                        print("country:"+response["country"]+"\nregion Name:"+response["regionName"]+"\ncity:"+response["city"]+"\nisp:"+response["isp"])
+                        pass
+                    else:
+                        print("ip not found")
+                else:
+                    print("error site down")
+            else:
+                print("error no ip in command")
+        elif command[0]=="cat":
+            command.pop(0)
+            duplicate=None
+            if len(command)>=2:
+                if (os.path.exists(command[0]) and os.path.isfile(command[0])) and (os.path.exists(command[0]) and os.path.isfile(command[1])):
+                    file1=command[0]
+                    file2=command[1]
+                else:
+                    file1=None
+                if len(command)>=3:
+                    file3=command[2]
+                    if len(command)>3:
+                        if command[3]=="-duplicate":
+                            duplicate=True
+
+                else:
+                    file3=None
+                
+                if file1!=None:
+                    if file3 == None:
+                        with open(file1,"r",encoding="utf-8") as file_read:
+                            file_read_dataset=file_read.readlines()
+                        file_read.close()
+                        with open(file2,"a",encoding="utf-8") as file_write:
+                            for sentence in file_read_dataset:
+                                file_write.write(sentence)
+                        file_write.close()
+                    else:
+                        with open(file1,"r",encoding="utf-8") as file_read:
+                            file_read_dataset_1=file_read.readlines()
+                        file_read.close()
+                        with open(file2,"r",encoding="utf-8") as file_read:
+                            file_read_dataset_2=file_read.readlines()
+                        file_read.close()
+                        try:
+                            file3=forbidden_charter(file3)
+                            with open(file3,"w",encoding="utf-8") as file_write:
+                                data_set=file_read_dataset_1+file_read_dataset_2
+                                if duplicate==True:
+                                    data_set=list(set(data_set))
+                                for sentence in data_set:file_write.write(sentence)
+                        except Exception:
+                            print(f"error file name not valid for {file3} ")
+
+                else:
+                    print("error in file input")
+
+            else:
+                print("error no parma in input")
+
+        elif command[0]=="touch":
+            #file1.txt file.txt file3.txt file4.txt
+            #file 1 to 4 ext
+            command.pop(0)
+            create=True
+            if "to" in command:
+                miin=0
+                maxi=0
+                step=1
+                if len(command)-1>=4:
+
+                    name=forbidden_charter(command[0])
+                    try:
+                        miin=int(command[1])
+                        maxi=int(command[3])
+                    except ValueError:
+                        create=False
+                        pass
+                    if miin>maxi:
+                        maxi,miin=miin,maxi
+                    if len(command)-1==5:
+                        try:
+                            step=int(command[5])
+                        except:
+                            pass
+                    if create==True:
+                        for miin in range(miin,maxi+1,step):
+                            with open(name+str(miin)+"."+command[4],"w+") as file_create:
+                                file_create.close()
+                    else:
+                        print("error")
+
+                else:
+                    print("error in parma insertion")
+            else:
+                if len(command)!=0:
+                    for x in command:
+                        x=forbidden_charter(x)
+                        with open(x,"w+") as file_create:
+                            file_create.close()
+                else:
+                    print("no file in input")
 
         else:
             print("command not found")
-            x=Correttore.Correttore(["apt","plugin","update","secret","hs","hy","history","sudo","pwd","protection","unprotection","wifi","cd","changedirectory","chd","md","mkd","mkdir","getsha","sha256","gtsh","get256","clear","cls","usb","more","mr","ls","listdir","lsdir","cp","copy","mv","move","rm","remove","srm","secureremove","grep","grp","gp","ex","exit","xexit","dn","down","download","mrm","multiremove","echo","pc","proc","process","en","encrypt","dc","decript","scf","search","rd","random","rnd","editfile","edf","fileedit"],1,command[0])
+            x=Correttore.Correttore(["track","cat","apt","plugin","update","secret","hs","hy","history","sudo","pwd","protection","unprotection","wifi","cd","changedirectory","chd","md","mkd","mkdir","getsha","sha256","gtsh","get256","clear","cls","usb","more","mr","ls","listdir","lsdir","cp","copy","mv","move","rm","remove","srm","secureremove","grep","grp","gp","ex","exit","xexit","dn","down","download","mrm","multiremove","echo","pc","proc","process","en","encrypt","dc","decript","scf","search","rd","random","rnd","editfile","edf","fileedit"],command[0])
             if len(x)>1:
                 x=" ".join(x)
             else:
@@ -1801,6 +2200,7 @@ while True:
             if len(x)!=0:
                 print("similar command " + "".join(x))
     except KeyboardInterrupt:
+        print("\n")
         pass                
          
 
@@ -1811,17 +2211,4 @@ while True:
 
 
 
-
-
-#TODO important
-
-
-
 #TODO
-#! Aggiungere where parma in ls
-#! Salvare gli errori su un file di log 
-
-
-
-
-

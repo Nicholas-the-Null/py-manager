@@ -1,15 +1,15 @@
 import os
 import platform
-import requests
+try:
+    import requests  #######installare prima
+except:
+    pass
 from getpass import getuser
 try:
-  from tqdm import tqdm
+    from tqdm import tqdm #installare prima
 except ImportError:
-      os.system("pip install tqdm")
-try:
-  import requests
-except ImportError:
-     os.system("pip install requests")
+    pass
+
 
 path_original=r''+os.getcwd()+"\\main"
 def download_file(link):
@@ -22,7 +22,7 @@ def download_file(link):
         return "Success"
     else:
         print("error")
-        return "[red]site not found "+"[/]"
+        return "[red]site not found "+"[/red]"
 
 def progress_bar(response,buffer_size,file_size,filename):
     progress = tqdm(response.iter_content(buffer_size), f"Downloading {filename}", total=file_size, unit="B", unit_scale=True, unit_divisor=1024)

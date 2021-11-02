@@ -2,8 +2,14 @@ import os
 import platform
 import requests
 from getpass import getuser
-from tqdm import tqdm
-
+try:
+  from tqdm import tqdm
+except ImportError:
+      os.system("pip install tqdm")
+try:
+  import requests
+except ImportError:
+     os.system("pip install requests")
 
 path_original=r''+os.getcwd()+"\\main"
 def download_file(link):

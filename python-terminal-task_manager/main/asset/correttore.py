@@ -1,83 +1,46 @@
+############## Correttore, Questo modulo correggera il comando e cercera di restituire quello più probabile
 
 
-
-def ListaDeleteLista2(lista,Lista2):
-    """Return in a list the different letter!"""
-    contatore=0
-    ricontatore=len(Lista2)
-    while contatore!=ricontatore:
-        if Lista2[contatore] in lista:
-            eliminare=0
-            while eliminare!=len(lista):
-                if lista[eliminare]==Lista2[contatore]:
-                    lista.pop(eliminare)
-                    eliminare-=1
-                eliminare+=1
-        contatore+=1
-    return lista
-
-
-
-def Correttore(database,precisione=1,wordo=""):
-    ida=0
-    check=wordo
-    list_possible1=[]
-    list_possible_final=[]
-    
-    
-    num_lines = len(database)
-    
-    while num_lines>ida:
-        file = database[ida]  # First Line
-        if file is None:
-            pass
-        check_distanza=len(file)-len(check)
-        if check_distanza<0:check_distanza*-1
-        if check_distanza>precisione:
-            pass
-        
+def Fix_letter(word1="",word2=""):
+    if len(word1)>len(word2):
+        passa=word2
+        word2=word1
+        word1=passa
+    result=[]
+    char_list=list(set(word1+word2))
+    for char in char_list:
+        if word1.count(char)==0:
+            result.append(char)
         else:
-            parola=file
-            if parola == check:
-                break
-            
-            file=list(file.lower())
-            l=ListaDeleteLista2(file,wordo)
-           
-            
-            if len(l)<=precisione:
-                 list_possible1.append(parola)
-        ida+=1
+            if word1.count(char)<word2.count(char):
+                result.append(char)
+            else:
+                pass
+    return result
 
-    
-    for x in list_possible1:
-        if len(x)==len(wordo):
-            list_possible_final.append(x)
-    
-    
-    if len(list_possible_final)==0:
-        list_possible_final=list_possible1
-    
-    list_possible1=[]
-    massimo=0
-    for x in list_possible_final:
-        attuale=0
-        try:
-            for posizione,parola in enumerate(x):
-                if wordo[posizione]==parola:
-                    attuale+=1
-            if attuale>massimo:
-                list_possible1=[x]
-                massimo=attuale
-            elif attuale==massimo:
-                list_possible1.append(x)
-        except:
-            pass
 
-    
-    list_possible_final=list_possible1
 
-    return list_possible_final
+def Correttore(commandi,parola)->list:
+    """restituisce la lista dei possibili duplicati"""
+    differenza_minima=4
+    database_possibile=[]
+    for command in commandi:
+        first_step=(len(command)-len(parola) if len(command)>len(parola) else len(parola)-len(command))*2
+        if first_step>=4:pass
+        else:
+            second_step=len(Fix_letter(command,parola))
+            if second_step==len(command):
+                second_step=99
+            first_step+=second_step
+            if first_step>=4:pass
+            else:
+                if first_step<differenza_minima:
+                    differenza_minima=first_step
+                    database_possibile=[]
+                    database_possibile.append(command)
+                elif first_step==differenza_minima:
+                    database_possibile.append(command)
+    return database_possibile
 
 
 
@@ -89,5 +52,3 @@ def Correttore(database,precisione=1,wordo=""):
 
 
 
-
-########## confrontare la lunghezza e la presenza di lettere

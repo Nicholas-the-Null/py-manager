@@ -17,10 +17,11 @@ __version__ = "1.1.1"
 
 ########################## edit here ###################
 
+######################### translate ################
 
-auth_var="Autenticazione"
-passowrd_lang="Contenuto"
-defaul_lang="it"
+auth_var="Autenticazione"      #<------------------
+passowrd_lang="Contenuto"      ##<------------------
+defaul_lang="it"               #<------------------
 
 def lang():
     return defaul_lang

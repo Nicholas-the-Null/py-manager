@@ -6,10 +6,13 @@ import os
 
 def progress_bar(response,buffer_size,file_size,filename):
     progress = tqdm(response.iter_content(buffer_size), f"Downloading {filename}", total=file_size, unit="B", unit_scale=True, unit_divisor=1024)
-    with open(filename, "wb") as f:
-        for data in progress:
-            f.write(data)
-            progress.update(len(data))
+    try:
+        with open(filename, "wb") as f:
+            for data in progress:
+                f.write(data)
+                progress.update(len(data))
+    except Exception:
+        pass
 
 def download_file(link):
     if requests.get(link).status_code==200:
@@ -18,7 +21,7 @@ def download_file(link):
         file_size = int(response.headers.get("Content-Length", 0))
         filename = link.split("/")[-1]
         progress_bar(response,buffer_size,file_size,filename)
-        return "Success"
+        return ["success",filename]
     else:
         return "[red]site not found "+"[/]"
 
@@ -98,7 +101,7 @@ def image(url):
                     urls.append(img_url)
             return urls
         def download(url):
-    
+            buffer_size = 1024
             response = requests.get(url, stream=True)
 
             # get the total file size
@@ -109,7 +112,7 @@ def image(url):
             print(filename)
 
             # progress bar, changing the unit to bytes instead of iteration (default by tqdm)
-            progress_bar(response,file_size,filename)
+            progress_bar(response,buffer_size,file_size,filename)
         imgs = get_all_images(url)
         for img in imgs:
             download(img)

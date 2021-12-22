@@ -1,0 +1,3 @@
+show_update True
+sudo_enable False
+show_debug False

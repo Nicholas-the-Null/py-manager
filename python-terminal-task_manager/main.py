@@ -1,9 +1,25 @@
 nice_conta_file=0
 test_echo_command_sha256=False
+sys_type="$"
+
+
+all_command_name_list=["load","echo","secret","hs","hy","history","update","sudo","pwd","protection","unprotection","wifi","cd","changedirectory","chd",
+"md","mkd","mkdir","getsha","sha256","gtsh","get256","usb","rd","random","rnd","more","mr","-tail","-head","ls","listdir","lsdir",
+"where","&dir","&file","&read","&write","&type","&size","cp","copy","mv","move","rm","remove","if","info","srm","secureremove",
+"grep","grp","gp","ex","exit","xexit","clear","cls","tree","title","sleep","dn","down","download","-file","-name","-site-js","-site-css",
+"-site-image","mrm","multiremove","-duplicate","pc","proc","process","en","encrypt","dc","decript","scf","search",
+"editfile","edf","fileedit","help","apt","plugin","track","cat","convertroman","sort","uniq","wc","wc_word","wc_line","wc_character",
+"wc_word_line","wc_character_line","wc_word_character","wc_word_character_line","diff","diff_line_word","diff_line","diff_character",
+"du","chattr","gawk","watch","rev","send","get","randomfile","randomword","rank","findServer","rdemail","neofetch","touch","randomwordfromlist","song"]
+
 
 #'\033[32m'
 
 import os
+import string
+import platform
+import stat
+uname=platform.uname()
 
 import msvcrt
 os.system("")
@@ -109,6 +125,22 @@ except ImportError:
     exit()
 
 
+try:
+    import youtube_dl
+    print(f"[+] success {nice_conta_file}")
+    nice_conta_file+=1
+except ImportError:
+    input('\033[31m'+"miss youtube_dl lib run first installer.py")
+    exit()
+
+try:
+    import pyperclip
+    print(f"[+] success {nice_conta_file}")
+    nice_conta_file+=1
+except ImportError:
+    input('\033[31m'+"miss pyperclip lib run first installer.py")
+    exit()
+
 from getpass import getpass,getuser
 print(f"[+] success {nice_conta_file}")
 nice_conta_file+=1
@@ -127,6 +159,7 @@ except ImportError:
     exit()
 
 import zipfile
+import webbrowser
     
 print("press a key to continue")
 msvcrt.getch()
@@ -139,6 +172,20 @@ try:
 except:
     data=None
 
+try:
+    from prompt_toolkit import prompt
+    from prompt_toolkit.completion import WordCompleter
+    from prompt_toolkit.shortcuts import message_dialog
+    from prompt_toolkit.application import in_terminal, run_in_terminal
+    from prompt_toolkit.key_binding import KeyBindings
+    bindings = KeyBindings()
+
+
+    
+
+except ImportError:
+    input('\033[31m'+"miss prompt lib run first installer.py")
+    exit()
 
 import ctypes
 
@@ -150,16 +197,99 @@ usb_active=False
 
 
 
+#######################################################freeboting function original author in command section #########################################################################
+
+
+
+def generateUserName():
+    name = string.ascii_lowercase + string.digits
+    username = ''.join(random.choice(name) for i in range(10))
+    return username
+
+def extract():
+    getUserName = re.search(r'login=(.*)&',newMail).group(1)
+    getDomain = re.search(r'domain=(.*)', newMail).group(1)
+    return [getUserName, getDomain]
+
+# Got this from https://stackoverflow.com/a/43952192/13276219
+def print_statusline(msg: str):
+    last_msg_length = len(print_statusline.last_msg) if hasattr(print_statusline, 'last_msg') else 0
+    print(' ' * last_msg_length, end='\r')
+    print(msg, end='\r')
+    sys.stdout.flush()
+    print_statusline.last_msg = msg
+
+def deleteMail():
+    url = 'https://www.1secmail.com/mailbox'
+    data = {
+        'action': 'deleteMailbox',
+        'login': f'{extract()[0]}',
+        'domain': f'{extract()[1]}'
+    }
+
+    print_statusline("Disposing your email address - " + mail + '\n')
+    req = requests.post(url, data=data)
+
+def checkMails():
+    reqLink = f'{API}?action=getMessages&login={extract()[0]}&domain={extract()[1]}'
+    req = requests.get(reqLink).json()
+    length = len(req)
+    if length == 0:
+        print_statusline("Your mailbox is empty. Hold tight. Mailbox is refreshed automatically every 5 seconds.")
+    else:
+        idList = []
+        for i in req:
+            for k,v in i.items():
+                if k == 'id':
+                    mailId = v
+                    idList.append(mailId)
+
+        x = 'mails' if length > 1 else 'mail'
+        print_statusline(f"You received {length} {x}. (Mailbox is refreshed automatically every 5 seconds.)")
+
+        current_directory = os.getcwd()
+        final_directory = os.path.join(current_directory, r'All Mails')
+        if not os.path.exists(final_directory):
+            os.makedirs(final_directory)
+
+        for i in idList:
+            msgRead = f'{API}?action=readMessage&login={extract()[0]}&domain={extract()[1]}&id={i}'
+            req = requests.get(msgRead).json()
+            for k,v in req.items():
+                if k == 'from':
+                    sender = v
+                if k == 'subject':
+                    subject = v
+                if k == 'date':
+                    date = v
+                if k == 'textBody':
+                    content = v
+
+            mail_file_path = os.path.join(final_directory, f'{i}.txt')
+
+            with open(mail_file_path,'w') as file:
+                file.write("Sender: " + sender + '\n' + "To: " + mail + '\n' + "Subject: " + subject + '\n' + "Date: " + date + '\n' + "Content: " + content + '\n')
+
+
+
+
+
+#############################################################################################################################################################################
 console = Console()
 history=[]
 primitive_path=r'C:\\Users\\'+str(getuser())
+var_old=0
 
 correct_path=r''+__file__
 correct_path=correct_path[:-8]
 original_usb=os.getcwd()
+load_var=False
 
+setup_path=r''+correct_path+"\\"+"setup.txt"
+under_watch=False
 plugin_path=r''+correct_path+"\\plugin"
 error_log_path=r''+correct_path+"\\log.txt"
+setup_path=r''+correct_path+"\\setup.txt"
 if os.path.exists(error_log_path) is False:
     with open(error_log_path,"w+") as file:
         pass
@@ -176,8 +306,22 @@ def error_log(command,error):
     ora=ora.strftime("%d-%b-%Y (%H:%M:%S.%f)")
     with open(error_log_path,"a",encoding="utf-8") as logs:
         logs.write("error at "+ora+" in command " + command + " with this message " + error +"\n")
-    if counter_error_passer%100==0:
+    if counter_error_passer%5==0:
         print("error if you want report please send log.txt file text to https://github.com/Nicholas-the-Null/py-manager/issues")
+
+def save_debug(command,text):
+    ora=datetime.now()
+    ora=ora.strftime("%d-%b-%Y (%H:%M:%S.%f)")
+    test_list=[]
+    with open(setup_path,"r") as file:
+        for x in file.readlines():test_list.append(x.split(' '))
+    file.close()
+    if test_list[2][1].strip()=="True":
+        with open(r''+correct_path+"\\debug.txt","a",encoding="utf-8") as logs:
+            logs.write("debug at "+ora+" in command " + str(command) +" " + str(text) +"\n")
+
+
+
 def GetShortPathName(path):
     if os.getcwd in [r"C:\\Users","C:",primitive_path]:
         path=path
@@ -209,13 +353,32 @@ def UnsetProtection():
 	ctypes.windll.ntdll.RtlSetProcessIsCritical(0, 0, 0) == 0
 
 
-forbidden_charter_data_set={'\\':'','/':'',':':'','*':'','?':'','"':'','<':'','>':'','|':''}
+def get_display_name():
+    GetUserNameEx = ctypes.windll.secur32.GetUserNameExW
+    NameDisplay = 3
+ 
+    size = ctypes.pointer(ctypes.c_ulong(0))
+    GetUserNameEx(NameDisplay, None, size)
+ 
+    nameBuffer = ctypes.create_unicode_buffer(size.contents.value)
+    GetUserNameEx(NameDisplay, nameBuffer, size)
+    return nameBuffer.value
+
+
+forbidden_charter_data_set={'/':'',':':'','*':'','?':'','"':'','<':'','>':'','|':''}
 
 def forbidden_charter(text,dict=forbidden_charter_data_set):
     for i, j in dict.items():
         text = text.replace(i, j)
     return text
 
+def convert_to_roman(number):
+    roman = {1: 'I', 4: 'IV', 5: 'V', 9: 'IX', 10: 'X', 40: 'XL', 50: 'L', 90: 'XC', 100: 'C', 400: 'CD', 500: 'D', 900: 'CM', 1000: 'M'}
+    roman_num = ''
+    for i in sorted(roman.keys())[::-1]:
+        roman_num += roman[i] * (number // i)
+        number %= i
+    return roman_num
 
 table = Table(title="info")
 table.add_column("time",style="magenta")
@@ -245,6 +408,52 @@ console.print(table)
 
 
 
+if update=="True":
+
+    test_list=[]
+    with open(setup_path,"r") as file:
+        for x in file.readlines():test_list.append(x.split(' '))
+    if test_list[0][1].strip()=="True":
+        message_dialog(
+        title='update',
+        text='a new update is online ').run()
+
+
+
+################################################################################################
+##############################shortcuts########################################################
+@bindings.add("f4")
+def _(event):
+    exit()
+        #event.app.current_buffer.insert_text("hello world")
+@bindings.add("f5")
+async def _(event):
+    global var_old
+    #ctypes.windll.user32.MessageBoxW(0, str(var_old), "Your title", 1)
+    try:
+        event.app.current_buffer.text=""
+        
+        #ctypes.windll.user32.MessageBoxW(0, str(len(history)-var_old-1), "Your title", 1)
+        #ctypes.windll.user32.MessageBoxW(0, str(len(history)-1), "Your title", 1)
+        event.app.current_buffer.insert_text(history[len(history)-var_old-1])
+        var_old+=1
+    except Exception as e:
+        pass
+        #ctypes.windll.user32.MessageBoxW(0, str(e), "errore di debug", 1)
+
+
+
+
+@bindings.add("f6")
+def _(event):
+    try:
+        event.app.current_buffer.insert_text(pyperclip.paste())
+    except Exception as e:
+        pass
+
+
+################################################################################################
+##############################shortcuts########################################################
 
 
 console.print("""[green] 
@@ -267,7 +476,7 @@ multi_command_parse=[]
 multi_command_string=""
 multi_command_parse_string=""
 
-
+save_debug("start","terminal started")
 
 while True:
     try:
@@ -287,7 +496,14 @@ while True:
 
 
         else:
-            command=console.input("[green]"+str(echo_off)+" "+sys_type+"[/green]>").split()
+            ##all_command_name_list
+            if load_var==False:
+                auto_completer=WordCompleter(all_command_name_list,ignore_case=True)
+            else:
+                auto_completer=WordCompleter(all_command_name_list+os.listdir(),ignore_case=True)
+
+            command=prompt(str(echo_off)+" "+sys_type+">",completer=auto_completer,key_bindings=bindings).split()
+            save_debug(command,"input")
         if "|" in command:
             found=False
             for commands in command:
@@ -311,6 +527,8 @@ while True:
             command.pop(0)
         else:
             history.append(" ".join(command))
+            var_old=0
+            
 
         if usb_active==True:
             dl = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -323,6 +541,7 @@ while True:
                 usb_active=False
                 os.chdir(original_usb)
                 command=["echo",f"error usb removed return to {original_usb}"]
+                save_debug("usb error","usb removed or else")
             
         if len(command)==0:
             command=["echo","no command in input"]
@@ -349,9 +568,11 @@ while True:
                     except Exception as e:
                         print("error file not valid "+ str(e))
                         error_log("history",str(e))
+                        save_debug("history",str(e))
 
                 else:
                     print("error invalid operator")
+                    save_debug("history","invalid operator")
             else:
                 table = Table(title="history")
                 table.add_column("numero",style="magenta")
@@ -369,8 +590,22 @@ while True:
                 print("no download found")             
 
         elif command[0].lower()=="sudo":
-            if ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)==42:
-                exit()
+            test_list=[]
+            with open(setup_path,"r") as file:
+                for x in file.readlines():
+                    test_list.append(x.split(' '))
+            if test_list[1][1].strip()=="True":
+                password=prompt("password: your name ", is_password=True)
+                if password==get_display_name():
+                    if ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)==42:
+                        exit()
+                    else:
+                        save_debug("sudo","abbort")
+                else:
+                    save_debug("sudo","wrong password")
+            else:
+                print("sudo is disable")
+                save_debug("sudo","disable")
           
             
         elif command[0].lower()=="pwd":print(os.getcwd())
@@ -382,6 +617,7 @@ while True:
                 print("ok")
             else:
                 print("error")
+                save_debug("protection","no sudo")
 
         elif command[0]=="unprotection":
             if sys_type=="#" and protect==True:
@@ -418,13 +654,6 @@ while True:
             command.pop(0)
             try:
                 directory=command[0]
-                directory_list=[]
-                try:
-                    for directoryname in os.listdir(os.getcwd()):
-                        if os.path.isdir(directoryname):
-                            directory_list.append(directoryname)
-                except:
-                    pass
                 if directory=="~":os.chdir(r'C:\\Users\\'+os.getlogin())
                 else:
                     directory=r''+directory
@@ -433,23 +662,48 @@ while True:
                             os.mkdir(directory)
                     else:
                         os.chdir(directory)
+                        save_debug("cd","create a new directory "+ directory)
             except Exception as e:
                 if Confirm.ask("Do you want return to home dir?"):
                     os.chdir(r'C:\\Users\\'+os.getlogin())
+                    save_debug("cd","return to home dir")
                 else:
                     console.print("[red]ok"+"[/red]")
 
+
+        elif command[0].lower()=="song":
+            command.pop(0)
+            if len(command)==0:
+                print("error no command")
+            else:
+                song=" ".join(command)
+                info = youtube_dl.YoutubeDL({"format" : "bestaudio", "quiet" : True}).extract_info(f"ytsearch{1}:{song}", download=False, ie_key="YoutubeSearch")
+                result=[]
+                for x in info["entries"]:
+                    result.append("https://www.youtube.com/watch?v="+x["id"])
+                webbrowser.open(result[0])
+                save_debug("song","open "+result[0])
+
         elif command[0].lower() in ["md","mkd","mkdir"]: #create dir
+            #create dir use forbidden_charter()  function for check dir name
+            #-p for create parent directory
             command.pop(0)
             if len(command)==0:
                 console.print("[red]error no name in input"+"[/red]")
             else:
                 if os.path.exists(command[0]):
                     console.print("[red]error directory already exists"+"[/red]")
+                    save_debug("md","directory already exists")
                 else:
                     try:
                         file_name=forbidden_charter(command[0])
-                        os.mkdir(file_name)
+                        if "-p" in command:
+                            os.makedirs(file_name,exist_ok=True)
+                            save_debug("md","create directory "+file_name+" with parent directory")
+                        else:
+                            file_name=file_name.replace("\\","")
+                            save_debug("md","create directory "+file_name)
+                            os.mkdir(file_name)
                     except Exception as e:
                         print(str(e))
                         error_log("mkd",str(e))
@@ -459,9 +713,11 @@ while True:
             if os.path.exists(command[0]) and os.path.isdir(command[0])==False:
                 input_type= "-file" 
                 result=main.asset.secure.file_sha256.File_calcolatore_sha256(command[0])
+                save_debug("getsha","sha256 of file "+command[0])
             else:
                 input_type="-string" 
                 result=main.asset.secure.file_sha256.String_calcolatore_sha256(command[0])
+                save_debug("getsha","sha256 of string "+command[0])
             
             table=Table(title="info")
             table.add_column("useriput",no_wrap=True,style="blue")
@@ -470,69 +726,7 @@ while True:
             table.add_row(command[0],input_type,result)
             console.print(table)
 
-        elif command[0].lower() in ["clear","cls"]:
-            command.pop(0)
-            if len(command)==0:
-                os.system("cls")
-            else:
-                if command[0]==">":
-                    command.pop(0)
-                    if os.path.exists(command[0]) and os.path.isdir(command[0]) is False:
-                        try:
-                            x=open(command[0],"w")
-                            x.write("")
-                            x.close()
-                        except Exception as e:
-                            print("error during file writing")
-                            error_log("cls",str(e))
-                    elif command[0].startswith("history"):
-                        if command[0]=="history":
-                            history=[]
-                        else:
-                            try:
-                                i=7
-                                partenza=""
-                                while True:
-                                    if command[0][i]!=":":
-                                        partenza+=command[0][i]
-                                    else:
-                                        break
-                                    i+=1
-
-
-                                partenza=int(partenza)
-                                
-                                fine=""
-                                i+=1
-                                while True:
-                                    if i==len(command[0]):break
-                                    
-                                    if command[0][i].isnumeric() is True:
-                                        fine+=command[0][i]
-                                    else:
-                                        break
-                                    i+=1
-                                
-                                fine=int(partenza)
-                                if fine<partenza:
-                                    scambio=fine
-                                    fine=partenza
-                                    partenza=scambio
-                                lista_app=[]
-                                for numero, stringa in enumerate(history):
-                                    if numero+1>=partenza and numero+1 <=fine:#errore elimina numer sbagliati
-                                        print(stringa)
-                                        
-                                    else:
-                                        lista_app.append(stringa)
-                                history=lista_app
-
-                            except Exception as e:
-                                error_log("cls",str(e))
-                                pass
-
-                else:
-                    print("error")
+        
 
         elif command[0].lower()=="usb":
             print("usb menu active")
@@ -564,10 +758,12 @@ while True:
                     try:
                         os.chdir(usb)
                         usb_active=True
+                        save_debug("usb","go on usb "+usb)
                         break
                     except:
                         if danger==False:
                             print("usb removed")
+                            save_debug("usb","usb removed")
                     
 
                 elif menu=="3":
@@ -578,6 +774,8 @@ while True:
                         break
                 else:
                     print("command not found")
+        
+
             
 
         elif command[0].lower() in ["rd","random","rnd"]:
@@ -608,6 +806,7 @@ while True:
                     
                     if duplicate == True and (finish-start)<many:
                         print("error too few with duplicate parma will be disable")
+                        save_debug("rd","error too few with duplicate parma will be disable")
                         duplicate=False
                     return_list=[]
                     while True:
@@ -619,12 +818,17 @@ while True:
                     if sort==True:
                         return_list.sort()
                     print(return_list)
+                    save_debug("rd","random "+str(start)+" "+str(finish)+" "+str(many) + str(return_list))
                 except ValueError:
+                    save_debug("rd","error value")
                     print("error string insert on numer request")
                     error_log("history","valueError")
             
             else:
                 print("error parma not given in input")
+
+
+        
 
         elif command[0].lower() in ["more","mr"]: # read file head for print first line default is 10 and tail for the last line
             command.pop(0)
@@ -644,6 +848,7 @@ while True:
                                 else:
                                     print(line.strip())
                                     number_line_conta+=1
+                            save_debug("more","read file "+command[0])
                         else:
                             if command[1].lower()=="-tail":
                                 number=10
@@ -659,6 +864,7 @@ while True:
 
                                     if number_line>=num_lines-number:
                                         print(line.strip())
+                                        save_debug("more","tail "+str(number)+" "+command[0])
                                     else:
                                         pass
 
@@ -675,19 +881,27 @@ while True:
                                     if number_line==number:break
                                     else:
                                         print(line.strip())
+                                        save_debug("more","more -head "+command[0])
 
 
                             else:
                                 console.print(f"[red]error parma {command[1]} not found"+"[/red]")
+                                save_debug("more","error parma "+command[1]+" not found")
 
                     except Exception as e:
                         console.print("[red]error i cant read file"+"[/red]")
                         error_log("more",str(e))
+                        save_debug("more",str(e))
                 else:
                     console.print("[red]error file not found"+"[/red]")
+                    save_debug("more","file not found")
 
             else:
                 console.print("[red]error no file in input"+"[/red]")
+                save_debug("more","no file in input")
+
+
+        
 
 
         elif command[0].lower() in ["ls","listdir","lsdir"]: #ls command print all file in a dir -l for long description -a for include all subdir and his file
@@ -949,15 +1163,7 @@ while True:
                 except:pass
 
 
-        elif command[0]=="chmod":
-            command.pop(0)
-            if len(command)==2:
-                try:
-                    os.chmod(command[0],int(command[1]))
-                except Exception as e:
-                    print(e)
-            else:
-                print("error")
+        
                 
         elif command[0].lower() in ["cp","copy"]: #copy file in another dir
             command.pop(0)
@@ -978,10 +1184,14 @@ while True:
                     except Exception as e:
                         console.print("[red]error i cant create new file "+str(e)+"[/red]")
                         error_log("cp",str(e))
+                        save_debug("cp",str(e))
                 else:
                     console.print("[red]file not found"+"[/red]")
+                    save_debug("cp","file not found")
             else:
                 console.print("[red]not parma in input"+"[/red]")
+                save_debug("cp","not parma in input")
+
 
 
         elif command[0].lower() in ["mv","move"]: #move file in another folder
@@ -994,15 +1204,22 @@ while True:
                     if os.path.exists(path):
                         try:
                             shutil.move(command[0],command[1])
+                            save_debug("mv",f"file {command[0]} moved in {command[1]}")
                         except Exception as e:
                             console.print("[red]error i cant create new file "+str(e)+"[/red]")
                             error_log("move",str(e))
+                            save_debug("move",str(e))
                     else:
                         console.print("[red]file not found"+"[/red]")
+                        save_debug("move","file not found")
                 else:
                     console.print("[red]file not found"+"[/red]")
+                    save_debug("move","file not found")
             else:
                 console.print("[red]not parma in input"+"[/red]")
+                save_debug("move","not parma in input")
+
+        
 
         elif command[0].lower() in ["rm","remove"]: #remove file
             command.pop(0)
@@ -1073,13 +1290,14 @@ while True:
                                         if os.path.isfile(path):
                                             os.remove(path)
                                         else:
-                                            parma
+                                            pass
                                     except Exception as e:
                                         pass
                         else:
                             if os.path.isdir(r''+os.getcwd()+"\\"+parma):
                                 if "-d" in command:
                                     shutil.rmtree(parma,ignore_errors=True)
+                                    os.rmdir(r''+os.getcwd()+"\\"+parma)
                             else:
                                 pass
             else:
@@ -1119,7 +1337,16 @@ while True:
 
 
 
-
+        elif command[0].lower()=="export":
+            command.pop(0)
+            if len(command)>=1:
+                file=command[0]
+                file=forbidden_charter(file)
+                with open(file,"w") as f:
+                    for x in history:
+                        f.write(x+"\n")
+            else:
+                print("parma not found")
 
         elif command[0].lower() in ["srm","secureremove"]: #secure rfemove file
             command.pop(0)
@@ -1185,13 +1412,109 @@ while True:
                 error_log("grep",str(e))
         
         elif command[0] in ["ex","exit","xexit"]:
-            if Confirm.ask("Do you want exit?"):
-                print("ok bye have a nice day :)")
-                time.sleep(2)
+            #exit to porgram ask conferm use Confirm.ask("do you want to exit")
+            #-f for force exit
+            #-s for save history on file name of in input
+            #-fa for force exit and save history on file name of in input
+            #create a new for save history on file
+            #use try except for save history on file
+            #time.sleep(2)
+            if "-f" in command:
+                exit()
+            elif "-s" in command:
+                if len(command)==2:
+                    try:
+                        with open(command[1],"w",encoding="utf-8") as file:
+                            file.write(str(console.history))
+                    except Exception as e:
+                        print("error in save history on file")
+                        error_log("exit",str(e))
+                else:
+                    console.print("[red]not parma in input"+"[/red]")
+            elif "-fa" in command:
+                if len(command)==2:
+                    try:
+                        with open(command[1],"w",encoding="utf-8") as file:
+                            file.write(str(console.history))
+                    except Exception as e:
+                        print("error in save history on file")
+                        error_log("exit",str(e))
+                else:
+                    console.print("[red]not parma in input"+"[/red]")
                 exit()
             else:
+                if Confirm.ask("do you want to exit"):
+                    exit()
+                else:
+                    console.print("[red]exit canceled"+"[/red]")
+
+        elif command[0] in ["clear","cls"]:
+            #clear screen
+            #-h for clean history
+            #-f 
+            #-hs for clean screen and history
+            if len(command)==1:
+                os.system("cls")
+            elif "-h" in command:
+                history=[]
+                var_old=0
+            elif "-hs" in command:
+                history=[]
+                os.system("cls")
+                var_old=0
+            else:
                 pass
+        
+        elif command[0]=="tree":
+            #create directory tree
+            command.pop(0)
+            if len(command)==0:
+                console.print("[red]not parma in input"+"[/red]")
+            else:
+                try:
+                    for x in command:
+                        if x=="$":x=os.getcwd()
+                        if os.path.isdir(x):
+                            print(x)
+                            for root, dirs, files in os.walk(x):
+                                level = root.replace(x, '').count(os.sep)
+                                indent = ' ' * 4 * (level)
+                                print('{}{}/'.format(indent, os.path.basename(root)))
+                                subindent = ' ' * 4 * (level + 1)
+                                for f in files:
+                                    print('{}{}'.format(subindent, f))
+                        else:
+                            console.print("[red]file not found"+"[/red]")
+                except Exception as e:
+                    print("error in tree")
+                    error_log("tree",str(e))
+        
+
+        elif command[0]=="title":
+            #change title of console
+            #title + command
+            command.pop(0)
+            if len(command)>=1:
+                title=command[0]
+                os.system("title "+title)
+            else:
+                console.print("[red]not parma in input"+"[/red]")
+        
+        
+        
+
+
+
+
+
+
+
+
+
+
+
         elif command[0]=="sleep":
+            #sleep for time in input
             command.pop(0)
             if len(command)>0:
                 try:
@@ -1202,9 +1525,13 @@ while True:
                     print("requires a number")
             else:
                 pass
+        
+
 
         elif command[0] in ["dn","down","download"]:
             #! tipo download sito cartella 
+            #download something from site to folder
+            #type of download url directory
             name=None 
             path=None
             original=os.getcwd()
@@ -1306,6 +1633,8 @@ while True:
             else:
                 console.print("[red]error no parma in input "+"[/red]")
             pass
+        
+
         
 
         elif command[0] in ["mrm","multiremove"]:
@@ -2043,9 +2372,17 @@ while True:
             if len(command)>=1:
                 plugin_file=command[0]
                 if plugin_file=="-list":
-                    for file in os.listdir(plugin_path):
-                        if os.path.isdir(r''+plugin_path+"\\"+plugin_file):
-                            print(file)
+                    if os.path.exists(plugin_path) is False:
+                        os.mkdir(plugin_path)
+                        print("dir was not found created")
+                    else:
+                        counter=0
+                        for file in os.listdir(plugin_path):
+                            if os.path.isdir(r''+plugin_path+"\\"+plugin_file):
+                                print(file)
+                                counter+=1
+                        if counter==0:
+                            print("no file found")
                 elif plugin_file=="-hash":
                     if len(command)>=2:
                         sys.path.append(r''+plugin_path+"\\"+command[1])
@@ -2097,6 +2434,7 @@ while True:
                     print("error site down")
             else:
                 print("error no ip in command")
+
         elif command[0]=="cat":
             command.pop(0)
             duplicate=None
@@ -2147,6 +2485,720 @@ while True:
             else:
                 print("error no parma in input")
 
+
+
+        elif command[0]=="convertroman":
+            #function to number convert to roman number format
+            command.pop(0)
+            if len(command)>=1:
+                number=command[0]
+                if number.isdigit():
+                    number=int(number)
+                else:
+                    number=None
+                if number!=None:
+                    #convert number to roman numeral
+                    roman_number=convert_to_roman(number)
+                    print(roman_number)
+                    
+                
+            else:
+                print("error")
+
+        
+                
+
+           
+            
+
+
+
+
+        elif command[0]=="sort":
+            command.pop(0)
+            if len(command)>=1:
+                file_name=command[0]
+
+                if len(command)>=2:
+                    try:
+                        if command[1]=="-line":
+                            if len(command)>=3:
+                                if command[2].isdigit():
+                                    position=int(command[2])
+                                    if position>=1:
+                                        if os.path.exists(file_name):
+                                            with open(file_name,"r",encoding="utf-8") as file_read:
+                                                file_read_dataset=file_read.readlines()
+                                            file_read.close()
+                                            file_read_dataset.sort(key=lambda x: x.split(" ")[position-1])
+                                            with open(file_name,"w",encoding="utf-8") as file_write:
+                                                for sentence in file_read_dataset:
+                                                    file_write.write(sentence)
+                                            file_write.close()
+                                        else:
+                                            print("error file not found")
+                                    else:
+                                        print("error position not valid")
+                                else:
+                                    print("error position not valid")
+                            else:
+                                print("error no position in input")
+                    except:
+                        pass
+                    else:
+                        print("error no option in input")
+                else:
+                    print("error no option in input")
+
+
+        elif command[0] == "uniq":
+            #delete duplicate line in a file 
+            #-d optional for write duplicate line in a another file
+            #else delete duplicate line in the same file
+            command.pop(0)
+            if len(command)>=1:
+                file_name=command[0]
+                if len(command)>=2:
+                    if command[1]=="-d":
+                        if len(command)>=3:
+                            if os.path.exists(file_name):
+                                with open(file_name,"r",encoding="utf-8") as file_read:
+                                    file_read_dataset=file_read.readlines()
+                                file_read.close()
+                                file_read_dataset=list(set(file_read_dataset))
+                                with open(command[2],"w",encoding="utf-8") as file_write:
+                                    for sentence in file_read_dataset:
+                                        file_write.write(sentence)
+                                file_write.close()
+                            else:
+                                print("error file not found")
+                        else:
+                            print("error no file in input")
+                    else:
+                        with open(file_name,"w",encoding="utf-8") as file_write:
+                            for sentence in file_read_dataset:
+                                file_write.write(sentence)
+                        file_write.close()
+                else:
+                    print("error no option in input")
+        
+        elif command[0]=="wc":
+            #count the number of line,word and character in a file
+            command.pop(0)
+            if len(command)>=1:
+                file_name=command[0]
+                if os.path.exists(file_name):
+                    with open(file_name,"r",encoding="utf-8") as file_read:
+                        file_read_dataset=file_read.readlines()
+                    file_read.close()
+                    line_count=0
+                    word_count=0
+                    character_count=0
+                    for sentence in file_read_dataset:
+                        line_count+=1
+                        word_count+=len(sentence.split(" "))
+                        character_count+=len(sentence)
+                    print(f"{line_count} {word_count} {character_count}")
+                else:
+                    print("error file not found")
+            else:
+                print("error no file in input")
+
+        elif command[0]=="wc_word":
+            #count the number of word in a file
+            command.pop(0)
+            if len(command)>=1:
+                file_name=command[0]
+                if os.path.exists(file_name):
+                    with open(file_name,"r",encoding="utf-8") as file_read:
+                        file_read_dataset=file_read.readlines()
+                    file_read.close()
+                    word_count=0
+                    for sentence in file_read_dataset:
+                        word_count+=len(sentence.split(" "))
+                    print(word_count)
+                else:
+                    print("error file not found")
+            else:
+                print("error no file in input")
+
+        elif command[0]=="wc_line":
+            #count the number of line in a file
+            command.pop(0)
+            if len(command)>=1:
+                file_name=command[0]
+                if os.path.exists(file_name):
+                    with open(file_name,"r",encoding="utf-8") as file_read:
+                        file_read_dataset=file_read.readlines()
+                    file_read.close()
+                    line_count=0
+                    for sentence in file_read_dataset:
+                        line_count+=1
+                    print(line_count)
+                else:
+                    print("error file not found")
+            else:
+                print("error no file in input")
+
+        elif command[0]=="wc_character":
+            #count the number of character in a file
+            command.pop(0)
+            if len(command)>=1:
+                file_name=command[0]
+                if os.path.exists(file_name):
+                    with open(file_name,"r",encoding="utf-8") as file_read:
+                        file_read_dataset=file_read.readlines()
+                    file_read.close()
+                    character_count=0
+                    for sentence in file_read_dataset:
+                        character_count+=len(sentence)
+                    print(character_count)
+                else:
+                    print("error file not found")
+            else:
+                print("error no file in input")
+
+        elif command[0]=="wc_word_line":
+            #count the number of word and line in a file
+            command.pop(0)
+            if len(command)>=1:
+                file_name=command[0]
+                if os.path.exists(file_name):
+                    with open(file_name,"r",encoding="utf-8") as file_read:
+                        file_read_dataset=file_read.readlines()
+                    file_read.close()
+                    line_count=0    
+                    word_count=0
+                    for sentence in file_read_dataset:
+                        line_count+=1
+                        word_count+=len(sentence.split(" "))
+                    print(f"{line_count} {word_count}")
+                else:  
+                    print("error file not found")
+            else:
+                print("error no file in input")
+        
+        elif command[0]=="wc_character_line":  
+            #count the number of character and line in a file
+            command.pop(0)
+            if len(command)>=1:
+                file_name=command[0]
+                if os.path.exists(file_name):
+                    with open(file_name,"r",encoding="utf-8") as file_read:
+                        file_read_dataset=file_read.readlines()
+                    file_read.close()
+                    line_count=0    
+                    character_count=0
+                    for sentence in file_read_dataset:
+                        line_count+=1
+                        character_count+=len(sentence)
+                    print(f"{line_count} {character_count}")
+                else:  
+                    print("error file not found")
+            else:
+                print("error no file in input")
+
+        elif command[0]=="wc_word_character":
+            #count the number of word and character in a file
+            command.pop(0)
+            if len(command)>=1:
+                file_name=command[0]
+                if os.path.exists(file_name):
+                    with open(file_name,"r",encoding="utf-8") as file_read:
+                        file_read_dataset=file_read.readlines()
+                    file_read.close()
+                    word_count=0    
+                    character_count=0
+                    for sentence in file_read_dataset:
+                        word_count+=len(sentence.split(" "))
+                        character_count+=len(sentence)
+                    print(f"{word_count} {character_count}")
+                else:  
+                    print("error file not found")
+            else:
+                print("error no file in input")
+
+        elif command[0]=="wc_word_character_line":
+            #count the number of word,character and line in a file
+            command.pop(0)
+            if len(command)>=1:
+                file_name=command[0]
+                if os.path.exists(file_name):
+                    with open(file_name,"r",encoding="utf-8") as file_read:
+                        file_read_dataset=file_read.readlines()
+                    file_read.close()
+                    line_count=0    
+                    word_count=0
+                    character_count=0
+                    for sentence in file_read_dataset:
+                        line_count+=1
+                        word_count+=len(sentence.split(" "))
+                        character_count+=len(sentence)
+                    print(f"{line_count} {word_count} {character_count}")
+                else:  
+                    print("error file not found")
+            else:
+                print("error no file in input")
+
+
+
+        
+
+
+        
+        elif command[0]=="diff":
+            #compare two file
+            command.pop(0)
+            if len(command)>=2:
+                file_name1=command[0]
+                file_name2=command[1]
+                if os.path.exists(file_name1) and os.path.exists(file_name2):
+                    with open(file_name1,"r",encoding="utf-8") as file_read1:
+                        file_read_dataset1=file_read1.readlines()
+                    file_read1.close()
+                    with open(file_name2,"r",encoding="utf-8") as file_read2:
+                        file_read_dataset2=file_read2.readlines()
+                    file_read2.close()
+                    if len(file_read_dataset1)==len(file_read_dataset2):
+                        for i in range(len(file_read_dataset1)):
+                            if file_read_dataset1[i]!=file_read_dataset2[i]:
+                                print(f"{i+1} {file_read_dataset1[i]}")
+                    else:
+                        print("error file not same")
+                else:
+                    print("error file not found")
+            else:
+                print("error no file in input")
+
+        elif command[0]=="diff_word":
+            #compare two file
+            command.pop(0)
+            if len(command)>=2:
+                file_name1=command[0]
+                file_name2=command[1]
+                if os.path.exists(file_name1) and os.path.exists(file_name2):
+                    with open(file_name1,"r",encoding="utf-8") as file_read1:
+                        file_read_dataset1=file_read1.readlines()
+                    file_read1.close()
+                    with open(file_name2,"r",encoding="utf-8") as file_read2:
+                        file_read_dataset2=file_read2.readlines()
+                    file_read2.close()
+                    if len(file_read_dataset1)==len(file_read_dataset2):
+                        for i in range(len(file_read_dataset1)):
+                            if file_read_dataset1[i].split(" ")!=file_read_dataset2[i].split(" "):
+                                print(f"{i+1} {file_read_dataset1[i]}")
+                    else:
+                        print("error file not same")
+                else:
+                    print("error file not found")
+            else:
+                print("error no file in input")
+
+        elif command[0]=="diff_character":
+            #compare two file
+            command.pop(0)
+            if len(command)>=2:
+                file_name1=command[0]
+                file_name2=command[1]
+                if os.path.exists(file_name1) and os.path.exists(file_name2):
+                    with open(file_name1,"r",encoding="utf-8") as file_read1:
+                        file_read_dataset1=file_read1.readlines()
+                    file_read1.close()
+                    with open(file_name2,"r",encoding="utf-8") as file_read2:
+                        file_read_dataset2=file_read2.readlines()
+                    file_read2.close()
+                    if len(file_read_dataset1)==len(file_read_dataset2):
+                        for i in range(len(file_read_dataset1)):
+                            if file_read_dataset1[i]!=file_read_dataset2[i]:
+                                print(f"{i+1} {file_read_dataset1[i]}")
+                    else:
+                        print("error file not same")
+                else:
+                    print("error file not found")
+            else:
+                print("error no file in input")
+
+        elif command[0]=="diff_line":
+            #compare two file
+            command.pop(0)
+            if len(command)>=2:
+                file_name1=command[0]
+                file_name2=command[1]
+                if os.path.exists(file_name1) and os.path.exists(file_name2):
+                    with open(file_name1,"r",encoding="utf-8") as file_read1:
+                        file_read_dataset1=file_read1.readlines()
+                    file_read1.close()
+                    with open(file_name2,"r",encoding="utf-8") as file_read2:
+                        file_read_dataset2=file_read2.readlines()
+                    file_read2.close()
+                    if len(file_read_dataset1)==len(file_read_dataset2):
+                        for i in range(len(file_read_dataset1)):
+                            if file_read_dataset1[i].split(" ")!=file_read_dataset2[i].split(" "):
+                                print(f"{i+1} {file_read_dataset1[i]}")
+                    else:
+                        print("error file not same")
+                else:
+                    print("error file not found")
+
+        elif command[0]=="diff_line_word":
+            #compare two file
+            command.pop(0)
+            if len(command)>=2:
+                file_name1=command[0]
+                file_name2=command[1]
+                if os.path.exists(file_name1) and os.path.exists(file_name2):
+                    with open(file_name1,"r",encoding="utf-8") as file_read1:
+                        file_read_dataset1=file_read1.readlines()
+                    file_read1.close()
+                    with open(file_name2,"r",encoding="utf-8") as file_read2:
+                        file_read_dataset2=file_read2.readlines()
+                    file_read2.close()
+                    if len(file_read_dataset1)==len(file_read_dataset2):
+                        for i in range(len(file_read_dataset1)):
+                            if file_read_dataset1[i].split(" ")!=file_read_dataset2[i].split(" "):
+                                print(f"{i+1} {file_read_dataset1[i]}")
+                    else:
+                        print("error file not same")
+                else:
+                    print("error file not found")
+
+        elif command[0]=="du":
+            #calcolate directory size
+            command.pop(0)
+            if len(command)>=1:
+                directory_name=command[0]
+                if os.path.exists(directory_name):
+                    directory_size=0
+                    for root, dirs, files in os.walk(directory_name):
+                        for file in files:
+                            file_path = os.path.join(root, file)
+                            directory_size += os.path.getsize(file_path)
+                    print(f"{directory_size}")
+                else:
+                    print("error directory not found")
+            else:
+                print("error no directory in input")
+        
+        elif command[0]=="chattr":
+            #change attribute of file
+            command.pop(0)
+            if len(command)>=2:
+                file_name=command[0]
+                attribute=command[1]
+                if os.path.exists(file_name):
+                    if attribute=="+i":
+                        os.chmod(file_name,stat.S_IWUSR)
+                    elif attribute=="-i":
+                        os.chmod(file_name,stat.S_IWUSR|stat.S_IWGRP|stat.S_IWOTH)
+                    elif attribute=="+r":
+                        os.chmod(file_name,stat.S_IRUSR)
+                    elif attribute=="-r":
+                        os.chmod(file_name,stat.S_IRUSR|stat.S_IRGRP|stat.S_IROTH)
+                    elif attribute=="+w":
+                        os.chmod(file_name,stat.S_IWUSR)
+                    elif attribute=="-w":
+                        os.chmod(file_name,stat.S_IWUSR|stat.S_IWGRP|stat.S_IWOTH)
+                    elif attribute=="+x":
+                        os.chmod(file_name,stat.S_IXUSR)
+                    elif attribute=="-x":
+                        os.chmod(file_name,stat.S_IXUSR|stat.S_IXGRP|stat.S_IXOTH)
+                    else:
+                        print("error attribute not found")
+                else:
+                    print("error file not found")
+            else:
+                print("error no file in input")
+        
+        elif command[0]=="gawk":
+            #filter file
+            command.pop(0)
+            if len(command)>=2:
+                file_name=command[0]
+                filter_word=command[1]
+                if os.path.exists(file_name):
+                    with open(file_name,"r",encoding="utf-8") as file_read:
+                        file_read_dataset=file_read.readlines()
+                    file_read.close()
+                    for i in range(len(file_read_dataset)):
+                        if filter_word in file_read_dataset[i]:
+                            print(f"{i+1} {file_read_dataset[i]}")
+                else:
+                    print("error file not found")
+            else:
+                print("error no file in input")
+        
+        elif command[0] == "watch":
+            #watch file and save in TempoLOG .txt and change under_watch variable
+            # if under_watch==True:
+            # if file change then save log and print log
+            # if file not change then dont print log
+            # if file not exist then dont print log
+            command.pop(0)
+            if len(command)>=1:
+                file_name=command[0]
+                if os.path.exists(file_name):
+                    if under_watch==False:
+                        under_watch=True
+                        with open(file_name,"r",encoding="utf-8") as file_read:
+                            file_read_dataset=file_read.readlines()
+                        file_read.close()
+                        with open("TempoLOG.txt","w",encoding="utf-8") as file_write:
+                            for i in range(len(file_read_dataset)):
+                                file_write.write(f"{i+1} {file_read_dataset[i]}")
+                        file_write.close()
+                        print("TempoLOG.txt created")
+                    else:
+                        with open(file_name,"r",encoding="utf-8") as file_read:
+                            file_read_dataset=file_read.readlines()
+                        file_read.close()
+                        with open("TempoLOG.txt","r",encoding="utf-8") as file_read_log:
+                            file_read_log_dataset=file_read_log.readlines()
+                        file_read_log.close()
+                        if len(file_read_dataset)==len(file_read_log_dataset):
+                            for i in range(len(file_read_dataset)):
+                                if file_read_dataset[i].split(" ")!=file_read_log_dataset[i].split(" "):
+                                    print(f"{i+1} {file_read_dataset[i]}")
+                                    with open("TempoLOG.txt","w",encoding="utf-8") as file_write:
+                                        for i in range(len(file_read_dataset)):
+                                            file_write.write(f"{i+1} {file_read_dataset[i]}")
+                                    file_write.close()
+                                    under_watch=False
+                        else:
+                            print("error file have more line")
+                            under_watch=False
+                            os.remove("TempoLOG.txt")
+                else:
+                    print("error file not found")
+            else:
+                print("error no file in input")
+    
+        elif command[0]=="rev":
+            #reverse file
+            command.pop(0)
+            if len(command)>=1:
+                file_name=command[0]
+                if os.path.exists(file_name):
+                    with open(file_name,"r",encoding="utf-8") as file_read:
+                        file_read_dataset=file_read.readlines()
+                    file_read.close()
+                    file_read_dataset.reverse()
+                    with open(file_name,"w",encoding="utf-8") as file_write:
+                        for i in range(len(file_read_dataset)):
+                            file_write.write(f"{i+1} {file_read_dataset[i]}")
+                    file_write.close()
+                else:
+                    print("error file not found")
+            else:
+                print("error no file in input")
+        
+        elif command[0]=="send":
+            #send data to remote server using requests.post() method
+            #optional username and password
+            command.pop(0)
+            if len(command)>=2:
+                url=command[0]
+                data=command[1]
+                if len(command)>=3:
+                    username=command[2]
+                    password=command[3]
+                    r=requests.post(url,data=data,auth=(username,password))
+                else:
+                    r=requests.post(url,data=data)
+                print(r.text)
+            else:
+                print("error no url or data in input")
+        
+        elif command[0]=="get":
+            #get data from remote server using requests.get() method
+            #optional username and password
+            command.pop(0)
+            if len(command)>=1:
+                url=command[0]
+                if len(command)>=3:
+                    username=command[2]
+                    password=command[3]
+                    r=requests.get(url,auth=(username,password))
+                else:
+                    r=requests.get(url)
+                print(r.text)
+            else:
+                print("error no url in input")
+
+
+        elif command[0]=="randomwordfromlist":
+            command.pop(0)
+            print(random.choice(command))
+
+        elif command[0]=="load":
+            if load_var==False:
+                load_var=True
+                print("load")
+            else:
+                load_var=False
+                print("unload")
+    
+        elif command[0]=="randomfile":
+            #seach random file in directory
+            #optional directory
+            command.pop(0)
+            if len(command)>=1:
+                directory=command[0]
+                if directory=="$":
+                    directory=os.getcwd()
+                if os.path.exists(directory):
+                    file_list=os.listdir(directory)
+                    random_file=random.choice(file_list)
+                    print(f"{directory}/{random_file}")
+                else:
+                    print("error directory not found")
+            else:
+                print("error no directory in input")
+
+
+        elif command[0]=="randomword":
+            #random word in a file in input
+            #optional file
+            command.pop(0)
+            if len(command)>=1:
+                file_name=command[0]
+                if os.path.exists(file_name):
+                    with open(file_name,"r",encoding="utf-8") as file_read:
+                        file_read_dataset=file_read.readlines()
+                    file_read.close()
+                    random_word=random.choice(file_read_dataset)
+                    print(random_word)
+                else:
+                    print("error file not found")
+            else:
+                print("error no file in input")
+        
+
+            
+
+
+
+            
+
+
+
+
+    
+        elif command[0]=="rank":
+            #rank file in directory on size
+            #-i for compare only files with same extension
+            #-r for reversed rank
+            reverse=False
+            file_list=[]
+            command.pop(0)
+            if len(command)>=1:
+                directory=command[0]
+                if directory=="$":
+                    directory=os.getcwd()
+                if os.path.exists(directory) and os.path.isdir(directory):
+                    if "-r" in command:
+                        reverse=True
+                    if "-i" in command:
+                        try:
+                            extension=command[command.index("-i")+1]
+                        except Exception as e:
+                            print(e)
+                            print("error no extension in input")
+                            extension=""
+                        if extension!="":
+                            file_list=os.listdir(directory)
+                            file_list_extension=[]
+                            for i in range(len(file_list)):
+                                if file_list[i].split(".")[-1]==extension:
+                                    file_list_extension.append(file_list[i])
+                            file_list=file_list_extension
+                    else:
+                        file_list=os.listdir(directory)
+                    file_list_size=[]
+                    for i in range(len(file_list)):
+                        file_list_size.append(os.path.getsize(f"{directory}/{file_list[i]}"))
+                    file_list_size_rank=[]
+                    for i in range(len(file_list_size)):
+                        file_list_size_rank.append(file_list_size[i])
+                    if reverse==True:
+                        file_list_size_rank.sort(reverse=True)
+                    else:
+                        file_list_size_rank.sort()
+                    for i in range(len(file_list_size_rank)):
+                        for j in range(len(file_list)):
+                            if file_list_size_rank[i]==file_list_size[j]:
+                                print(f"{i+1} {file_list[j]}")
+                                break
+                else:
+                    print("error directory not found")
+            else:
+                print("error no directory in input")
+
+        
+        elif command[0]=="findServer":
+            #find file in dir remote server in input
+            #optional username and password
+            command.pop(0)
+            if len(command)>=1:
+                server_url=command[0]
+                if len(command)>=2:
+                    data=command[1]
+                    if len(command)>=4:
+                        username=command[2]
+                        password=command[3]
+                        r=requests.get(server_url,data=data,auth=(username,password))
+                    else:
+                        r=requests.get(server_url,data=data)
+                    print(r.text)
+                else:
+                    print("error no data in input")
+            else:
+                print("error no url in input")
+
+        
+        elif command[0]=="rdemail":
+            #by https://github.com/sameera-madushan/Mail-Swipe
+            #name Sameera Madushan
+            #thank you for create this awesome repository
+            API = 'https://www.1secmail.com/api/v1/'
+            domainList = ['1secmail.com', '1secmail.net', '1secmail.org']
+            domain = random.choice(domainList)
+            command.pop(0)
+            domaint="N"
+            if len(command)==2:
+                if command[0].lower()=="y":
+                    domaint=command[1]
+                    newMail = f"{API}?login={domaint}&domain={domain}"
+            else:newMail = f"{API}?login={generateUserName()}&domain={domain}"
+            reqMail = requests.get(newMail)
+            mail = f"{extract()[0]}@{extract()[1]}"
+            print("\nYour temporary email is " + mail + " (Email address copied to clipboard.)" + "\n")
+            print(f"---------------------------- | Inbox of {mail} | ----------------------------\n")
+            print("CTRL+C=exit from this command")
+            try:
+                while True:
+                    checkMails()
+                    time.sleep(5)
+            except KeyboardInterrupt:
+                deleteMail()
+            
+            
+
+        elif command[0]=="neofetch":
+            boot_time_timestamp = psutil.boot_time()
+            bt = datetime.fromtimestamp(boot_time_timestamp)
+            print(f""" 
+                       /\_____/\\
+                      /  o   o  \\
+                     ( ==  ^  == )
+                      )         (
+                     (          )
+                    ( (  )   (  ) )
+                   (__(__)___(__)__)\n
+                   system : {uname.system} {uname.version}\n
+                   terminal version {version}\n
+                   boot time {bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}\n
+                   processor info {uname.processor}\n 
+                   memory info {psutil.virtual_memory().total//(1024*1024*1024)}GB""")
         elif command[0]=="touch":
             #file1.txt file.txt file3.txt file4.txt
             #file 1 to 4 ext
@@ -2192,7 +3244,7 @@ while True:
 
         else:
             print("command not found")
-            x=Correttore.Correttore(["track","cat","apt","plugin","update","secret","hs","hy","history","sudo","pwd","protection","unprotection","wifi","cd","changedirectory","chd","md","mkd","mkdir","getsha","sha256","gtsh","get256","clear","cls","usb","more","mr","ls","listdir","lsdir","cp","copy","mv","move","rm","remove","srm","secureremove","grep","grp","gp","ex","exit","xexit","dn","down","download","mrm","multiremove","echo","pc","proc","process","en","encrypt","dc","decript","scf","search","rd","random","rnd","editfile","edf","fileedit"],command[0])
+            x=Correttore.Correttore(all_command_name_list,command[0])
             if len(x)>1:
                 x=" ".join(x)
             else:
@@ -2208,7 +3260,8 @@ while True:
             
 
 
-
-
-
 #TODO
+#add command to create file in dir with random name
+#add command to create file in dir with random name and random ext
+#add command to create file in dir with random name and random ext and random size
+#add command for find 

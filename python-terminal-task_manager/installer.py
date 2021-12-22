@@ -129,6 +129,16 @@ else:
     except ImportError:
         os.system("pip install rich")
 
+    try:
+        import youtube_dl
+    except ImportError:
+        os.system("pip install youtube_dl")
+    
+    try:
+        import pyperclip
+    except ImportError:
+        os.system("pip install pyperclip")
+
     
     try:
         from tqdm import tqdm
@@ -158,6 +168,8 @@ else:
         import psutil
     except ImportError:
         os.system("pip install psutil")
+
+    os.system("pip install prompt_toolkit")
         
     
     print("i've seen enough i'm satisfied")

@@ -55,8 +55,8 @@ use your favorite linux commands on windows
 
 ### quotes
 
-* [ReadMe template](https://github.com/logicguy1/Discord-Nitro-Generator-and-Checker)
 
+* [ReadMe template](https://github.com/logicguy1/Discord-Nitro-Generator-and-Checker)
 
 ## Getting Started
 
@@ -66,16 +66,19 @@ To get a local copy up and running follow these simple steps.
 You need to install python, that can be done [here](https://www.python.org)
 
 ### Installation
+
 1. Clone the repo
    ```sh
    git clone https://github.com/Nicholas-the-Null/py-manager.git
+   
    ```
+   
 2. Install Python packages
    ```sh
    python installer.py
+   
    ```
    
-
 
 ## Roadmap
 
@@ -84,7 +87,6 @@ See the [open issues]("https://github.com/Nicholas-the-Null/py-manager/issues/is
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
 
 ## feature
 

@@ -468,6 +468,18 @@ if __name__ == '__main__':
         except Exception as e:
             pass
 
+    @bindings.add("f7")
+    def _(event):
+        try:
+            pyperclip.copy(event.app.current_buffer.text)
+        except Exception as e:
+            pass
+    
+    @bindings.add("f8")
+    def _(event):
+        os.startfile(__file__)
+        sys.exit()
+
 
     ################################################################################################
     ##############################shortcuts########################################################
@@ -502,7 +514,7 @@ if __name__ == '__main__':
             if status_deamon.is_alive():
                 pass
             else:
-                print("[red]deamon is dead")
+                console.print("[red]deamon ise dead"+"[/red]")
                 status_deamon=None
         
         try:
@@ -598,12 +610,13 @@ if __name__ == '__main__':
                                 for numero,nome in enumerate(history):
                                     f.write(str(numero+1)+ " " +str(nome)+"\n")
                         except Exception as e:
-                            print("error file not valid "+ str(e))
+                            console.print("[red]error file not valid "+ str(e)+"[/red]")
                             error_log("history",str(e))
                             save_debug("history",str(e))
 
                     else:
-                        print("error invalid operator")
+                        console.print("[red]error invalid operator"+"[/red]")
+                        
                         save_debug("history","invalid operator")
                 else:
                     table = Table(title="history")
@@ -619,7 +632,8 @@ if __name__ == '__main__':
                     #DonwloadLib.download_file("https://site.todonwload")#site
                     print("download complete")
                 else:
-                    print("no download found")  
+                    console.print("[red]no download found"+"[/red]")
+                    
 
 
             elif command[0]=="deamon":
@@ -631,9 +645,11 @@ if __name__ == '__main__':
                             status_deamon=None
                             print("deamon stopped")
                         else:
-                            print("error invalid command")
+                            console.print("[red]error invalid command "+"[/red]")
+                            
                     else:
-                        print("error invalid command")
+                        console.print("[red]error invalid operator"+"[/red]")
+                        
                 else:
                     if len(command)==4:
                         action=command[0]
@@ -651,10 +667,12 @@ if __name__ == '__main__':
                             status_deamon.start()
                             print("deamon started")
                         else:
-                            print("error invalid command")
+                            console.print("[red]error invalid command"+"[/red]")
+                            
 
                     else:
-                        print("error missing parameter")
+                        console.print("[red]error missing parameter"+"[/red]")
+                        
 
 
 
@@ -673,7 +691,7 @@ if __name__ == '__main__':
                     else:
                         save_debug("sudo","wrong password")
                 else:
-                    print("sudo is disable")
+                    console.print("[red]sudo is disable"+"[/red]")
                     save_debug("sudo","disable")
             
                 
@@ -685,7 +703,7 @@ if __name__ == '__main__':
                     protect=True
                     print("ok")
                 else:
-                    print("error")
+                    console.print("[red]error "+"[/red]")
                     save_debug("protection","no sudo")
 
             elif command[0]=="unprotection":
@@ -694,7 +712,7 @@ if __name__ == '__main__':
                     protect=False
                     print("ok")
                 else:
-                    print("error")
+                    console.print("[red]error "+"[/red]")
 
 
             
@@ -717,7 +735,7 @@ if __name__ == '__main__':
                                 wifi.generate_qr_code(wifi.get_ssid(),wifi.get_password(wifi.get_ssid()),wifi.get_auth(),"ciao.png",False)
 
                 else:
-                    print("error ")
+                    console.print("[red]error "+"[/red]")
 
             elif command[0].lower() in ["cd","changedirectory","chd"]: #change dir
                 command.pop(0)
@@ -743,7 +761,7 @@ if __name__ == '__main__':
             elif command[0].lower()=="song":
                 command.pop(0)
                 if len(command)==0:
-                    print("error no command")
+                    console.print("[red]error no command "+"[/red]")
                 else:
                     song=" ".join(command)
                     info = youtube_dl.YoutubeDL({"format" : "bestaudio", "quiet" : True}).extract_info(f"ytsearch{1}:{song}", download=False, ie_key="YoutubeSearch")
@@ -842,7 +860,7 @@ if __name__ == '__main__':
                         else:
                             break
                     else:
-                        print("command not found")
+                        console.print("[red]error command not found "+"[/red]")
             
 
                 
@@ -890,11 +908,12 @@ if __name__ == '__main__':
                         save_debug("rd","random "+str(start)+" "+str(finish)+" "+str(many) + str(return_list))
                     except ValueError:
                         save_debug("rd","error value")
-                        print("error string insert on numer request")
-                        error_log("history","valueError")
+                        console.print("[red]error string insert on number requests "+"[/red]")
+                        
                 
                 else:
-                    print("error parma not given in input")
+                    console.print("[red]error parma not given in input "+"[/red]")
+                    
 
 
             
@@ -1261,6 +1280,9 @@ if __name__ == '__main__':
                     console.print("[red]not parma in input"+"[/red]")
                     save_debug("cp","not parma in input")
 
+            
+            
+
 
 
             elif command[0].lower() in ["mv","move"]: #move file in another folder
@@ -1291,6 +1313,8 @@ if __name__ == '__main__':
             
 
             elif command[0].lower() in ["rm","remove"]: #remove file
+                textchars = bytearray({7,8,9,10,12,13,27} | set(range(0x20, 0x100)) - {0x7f})
+                is_binary_string = lambda bytes: bool(bytes.translate(None, textchars))
                 command.pop(0)
                 path_command=os.getcwd()
                 for x in command:
@@ -1318,8 +1342,12 @@ if __name__ == '__main__':
                                     if os.path.isdir(r''+path_command+"\\"+x):
                                         shutil.rmtree(x,ignore_errors=True)
                                     else:
-                                        with open(r''+path_command+"\\"+x,encoding="utf-8") as f:
-                                            a=f.read()
+                                        if is_binary_string(open(r''+path_command+"\\"+x, 'rb').read(1024)):
+                                            with open(r''+path_command+"\\"+x, 'rb') as f:
+                                                a = f.read()
+                                        else:
+                                            with open(r''+path_command+"\\"+x,encoding="utf-8") as f:
+                                                a=f.read()
                                         f.close()
                                         filea=preserve.File(x,a,path_command)
                                         preserve_list.append(filea)
@@ -1335,8 +1363,12 @@ if __name__ == '__main__':
                                     try:
                                         if os.path.isdir(r''+path_command+"\\"+x):pass
                                         else:
-                                            with open(r''+path_command+"\\"+x,encoding="utf-8") as f:
-                                                a=f.read()
+                                            if is_binary_string(open(r''+path_command+"\\"+x, 'rb').read(1024)):
+                                                with open(r''+path_command+"\\"+x, 'rb') as f:
+                                                    a = f.read()
+                                            else:
+                                                with open(r''+path_command+"\\"+x,encoding="utf-8") as f:
+                                                    a=f.read()
                                             f.close()
                                             filea=preserve.File(x,a,path_command)
                                             preserve_list.append(filea)
@@ -1352,8 +1384,12 @@ if __name__ == '__main__':
                                     try:
                                         if os.path.isdir(r''+path_command+"\\"+x):pass
                                         else:
-                                            with open(r''+path_command+"\\"+x,encoding="utf-8") as f:
-                                                a=f.read()
+                                            if is_binary_string(open(r''+path_command+"\\"+x, 'rb').read(1024)):
+                                                with open(r''+path_command+"\\"+x, 'rb') as f:
+                                                    a = f.read()
+                                            else:
+                                                with open(r''+path_command+"\\"+x,encoding="utf-8") as f:
+                                                    a=f.read()
                                             f.close()
                                             filea=preserve.File(x,a,path_command)
                                             preserve_list.append(filea)
@@ -1363,15 +1399,19 @@ if __name__ == '__main__':
                         else:
                             if os.path.isfile(parma):
                                 try:
-                                    with open(path_command+"\\"+parma,"r",encoding="utf-8") as f:
-                                        a=f.read()
+                                    if is_binary_string(open(r''+path_command+"\\"+x, 'rb').read(1024)):
+                                        with open(r''+path_command+"\\"+x, 'rb') as f:
+                                                    a = f.read()
+                                    else:
+                                        with open(r''+path_command+"\\"+x,encoding="utf-8") as f:
+                                            a=f.read()
                                     f.close()
 
                                     filea=preserve.File(parma,a,path_command)
                                     preserve_list.append(filea)
                                     os.remove(parma)
                                 except Exception as e:
-                                    print("error i cant remove file")
+                                    console.print("[red]error i cant remove file "+"[/red]")
                                     print(e)
                             elif os.path.isdir(parma):
                                 if "-d" in command:
@@ -1394,7 +1434,8 @@ if __name__ == '__main__':
                                 else:
                                     pass
                 else:
-                    print("error command wrong")
+                    console.print("[red]error command wrong "+"[/red]")
+                    
 
             elif command[0].lower() =="save":
                 #directory and filename
@@ -1464,10 +1505,11 @@ if __name__ == '__main__':
                             table.add_row(nome1,is_dir,size,tempo,read,write)
                             console.print(table)
                         except Exception as e:
-                            print("error "+str(e))
+                            console.print("[red]error "+str(e)+"[/red]")
+                            
                             error_log("info",str(e))
                     else:
-                        print("error file not dound or is a dir")
+                        console.print("[red]error dont found or is a dir "+"[/red]")
                 else:
                     print("parma not found")
 
@@ -1545,7 +1587,7 @@ if __name__ == '__main__':
                     else:
                         console.print("[red]file not found"+"[/red]")
                 except Exception as e:
-                    print("error in regx read")
+                    console.print("[red]error in regex read "+"[/red]")
                     error_log("grep",str(e))
             
             elif command[0] in ["ex","exit","xexit"]:
@@ -3402,10 +3444,5 @@ if __name__ == '__main__':
 
 
     #TODO
-    #add command to create file in dir with random name
-    #add command to create file in dir with random name and random ext
-    #add command to create file in dir with random name and random ext and random size
-    #add command for find 
+    
 
-
-    #! add refactor ripristino i file eliminati solo se il programma non è stato chiuso

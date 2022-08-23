@@ -12,7 +12,7 @@ if __name__ == '__main__':
     "-site-image","mrm","multiremove","-duplicate","pc","proc","process","en","encrypt","dc","decript","scf","search",
     "editfile","edf","fileedit","help","apt","plugin","track","cat","convertroman","sort","uniq","wc","wc_word","wc_line","wc_character",
     "wc_word_line","wc_character_line","wc_word_character","wc_word_character_line","diff","diff_line_word","diff_line","diff_character",
-    "du","chattr","gawk","watch","rev","send","get","randomfile","randomword","rank","findServer","rdemail","neofetch","touch","randomwordfromlist","song"]
+    "du","chattr","gawk","watch","rev","send","get","randomfile","randomword","rank","findServer","rdemail","neofetch","touch","randomwordfromlist","song","explore"]
 
 
     #'\033[32m'
@@ -564,14 +564,17 @@ if __name__ == '__main__':
             if command[0]=="secret":
                 command.pop(0)
             else:
-                history.append(" ".join(command))
-                if os.path.exists(history_path):
-                    with open(history_path,"a") as file:
-                        file.write(" ".join(command)+"\n")
+                if command==["echo",""]:
+                    pass
                 else:
-                    with open(history_path,"w") as file:
-                        file.write(" ".join(command)+"\n")
-                var_old=0
+                    history.append(" ".join(command))
+                    if os.path.exists(history_path):
+                        with open(history_path,"a") as file:
+                            file.write(" ".join(command)+"\n")
+                    else:
+                        with open(history_path,"w") as file:
+                            file.write(" ".join(command)+"\n")
+                    var_old=0
                 
 
             if usb_active==True:
@@ -1345,11 +1348,13 @@ if __name__ == '__main__':
                                         if is_binary_string(open(r''+path_command+"\\"+x, 'rb').read(1024)):
                                             with open(r''+path_command+"\\"+x, 'rb') as f:
                                                 a = f.read()
+                                                typea="byte"
                                         else:
                                             with open(r''+path_command+"\\"+x,encoding="utf-8") as f:
                                                 a=f.read()
+                                                typea="text"
                                         f.close()
-                                        filea=preserve.File(x,a,path_command)
+                                        filea=preserve.File(x,a,path_command,typea)
                                         preserve_list.append(filea)
                                         os.remove(r''+path_command+"\\"+x)
                                 except Exception as e:
@@ -1366,11 +1371,13 @@ if __name__ == '__main__':
                                             if is_binary_string(open(r''+path_command+"\\"+x, 'rb').read(1024)):
                                                 with open(r''+path_command+"\\"+x, 'rb') as f:
                                                     a = f.read()
+                                                    typea="byte"
                                             else:
                                                 with open(r''+path_command+"\\"+x,encoding="utf-8") as f:
                                                     a=f.read()
+                                                    typea="text"
                                             f.close()
-                                            filea=preserve.File(x,a,path_command)
+                                            filea=preserve.File(x,a,path_command,typea)
                                             preserve_list.append(filea)
                                             os.remove(r''+path_command+"\\"+x)
                                     except Exception as e:
@@ -1387,11 +1394,13 @@ if __name__ == '__main__':
                                             if is_binary_string(open(r''+path_command+"\\"+x, 'rb').read(1024)):
                                                 with open(r''+path_command+"\\"+x, 'rb') as f:
                                                     a = f.read()
+                                                    typea="byte"
                                             else:
                                                 with open(r''+path_command+"\\"+x,encoding="utf-8") as f:
                                                     a=f.read()
+                                                    typea="text"
                                             f.close()
-                                            filea=preserve.File(x,a,path_command)
+                                            filea=preserve.File(x,a,path_command,typea)
                                             preserve_list.append(filea)
                                             os.remove(r''+path_command+"\\"+x)
                                     except Exception as e:
@@ -1401,13 +1410,15 @@ if __name__ == '__main__':
                                 try:
                                     if is_binary_string(open(r''+path_command+"\\"+x, 'rb').read(1024)):
                                         with open(r''+path_command+"\\"+x, 'rb') as f:
-                                                    a = f.read()
+                                            a = f.read()
+                                            typea="byte"
                                     else:
                                         with open(r''+path_command+"\\"+x,encoding="utf-8") as f:
                                             a=f.read()
+                                            typea="text"
                                     f.close()
 
-                                    filea=preserve.File(parma,a,path_command)
+                                    filea=preserve.File(x,a,path_command,typea)
                                     preserve_list.append(filea)
                                     os.remove(parma)
                                 except Exception as e:
@@ -1471,12 +1482,17 @@ if __name__ == '__main__':
                             print(x.toString())
                     elif command[1]=="-c":
                         preserve_list.clear()
+                    else:
+                        console.print("[red]error command wrong"+"[/red]")
+
+
                 else:
 
                     if preserve_list!=[]:
 
                         for x in preserve_list:
-                            x.refactor()
+                            if x.checkIfIsEmpty()==False:
+                                x.refactor()
                         preserve_list=[]
                     else:
                         print("no file to refactor")
@@ -1590,6 +1606,8 @@ if __name__ == '__main__':
                     console.print("[red]error in regex read "+"[/red]")
                     error_log("grep",str(e))
             
+
+
             elif command[0] in ["ex","exit","xexit"]:
                 #exit to porgram ask conferm use Confirm.ask("do you want to exit")
                 #-f for force exit
@@ -1678,7 +1696,7 @@ if __name__ == '__main__':
                 #title + command
                 command.pop(0)
                 if len(command)>=1:
-                    title=command[0]
+                    title=" ".join(command)
                     os.system("title "+title)
                 else:
                     console.print("[red]not parma in input"+"[/red]")
@@ -1826,10 +1844,10 @@ if __name__ == '__main__':
                 original=os.getcwd()
                 command.pop(0)
                 if len(command)!=0:
-                    if command[0]=="$":command[0]=os.getcwd()
-                    if os.path.exists(command[0]) and os.path.isdir(command[0]):
-                        os.chdir(command[0])
-                        command.pop(0)
+                    if command[0]=="$" or command[0][0]=="-":
+                        directory=os.getcwd()
+                    if os.path.exists(directory) and os.path.isdir(directory):
+                        os.chdir(directory)
                         if not len(command)==0:
 
                             if command[0] in ["-srm","-secureremove"]:
@@ -2086,6 +2104,7 @@ if __name__ == '__main__':
                 if len(command)==1:
                     if os.path.exists(command[0]):
                         bufferSize = 1024 * 1024
+                        if command[0]=="$":command[0]=os.getcwd()
                         if os.path.isdir(command[0]):
                             for file in os.listdir(command[0]):
                                 if os.path.isdir(file) is False:
@@ -2130,6 +2149,7 @@ if __name__ == '__main__':
                 if len(command)==1:
                     if os.path.exists(command[0]):
                         bufferSize = 1024 * 1024
+                        if command[0]=="$":command[0]=os.getcwd()
                         if os.path.isdir(command[0]):
                                 for file in os.listdir(command[0]):
                                     if os.path.isdir(file) is False:
@@ -2779,7 +2799,7 @@ if __name__ == '__main__':
                         character_count=0
                         for sentence in file_read_dataset:
                             line_count+=1
-                            word_count+=len(sentence.split(" "))
+                            word_count+=len(sentence.split(" "))-1
                             character_count+=len(sentence)
                         print(f"{line_count} {word_count} {character_count}")
                     else:
@@ -3048,8 +3068,13 @@ if __name__ == '__main__':
             elif command[0]=="du":
                 #calcolate directory size
                 command.pop(0)
+                if len(command)==0:
+                    command.append(os.getcwd())
+
                 if len(command)>=1:
                     directory_name=command[0]
+                    if directory_name=="$":
+                        directory_name=os.getcwd()
                     if os.path.exists(directory_name):
                         directory_size=0
                         for root, dirs, files in os.walk(directory_name):
@@ -3164,7 +3189,7 @@ if __name__ == '__main__':
                         with open(file_name,"r",encoding="utf-8") as file_read:
                             file_read_dataset=file_read.readlines()
                         file_read.close()
-                        file_read_dataset.reverse()
+                        file_read.dataset=file_read_dataset.reverse()
                         with open(file_name,"w",encoding="utf-8") as file_write:
                             for i in range(len(file_read_dataset)):
                                 file_write.write(f"{i+1} {file_read_dataset[i]}")
@@ -3231,7 +3256,7 @@ if __name__ == '__main__':
                     if os.path.exists(directory):
                         file_list=os.listdir(directory)
                         random_file=random.choice(file_list)
-                        print(f"{directory}/{random_file}")
+                        print(f"{directory}\\{random_file}")
                     else:
                         print("error directory not found")
                 else:
@@ -3273,9 +3298,11 @@ if __name__ == '__main__':
                 reverse=False
                 file_list=[]
                 command.pop(0)
+                if len(command)==0:
+                    command.append(os.getcwd())
                 if len(command)>=1:
                     directory=command[0]
-                    if directory=="$":
+                    if directory=="$" or (directory=="-i" or directory=="-r"):
                         directory=os.getcwd()
                     if os.path.exists(directory) and os.path.isdir(directory):
                         if "-r" in command:
@@ -3337,11 +3364,65 @@ if __name__ == '__main__':
                 else:
                     print("error no url in input")
 
+
+            elif command[0]=="explore":
+                command.pop(0)
+                directory_info={}
+                if len(command)==0:
+                    command.append("$")
+                if len(command)>=1:
+                    directory=command[0]
+                    if directory=="$":
+                        directory=os.getcwd()
+                    if os.path.exists(directory) and os.path.isdir(directory):
+                        file_list=os.listdir(directory)
+                        for i in range(len(file_list)):
+                            if os.path.isfile(r''+directory+"\\"+file_list[i]):
+                                #get exetension
+                                extension=file_list[i].split(".")[-1]
+                            else:
+                                extension="folder"
+                            if extension in directory_info:
+                                directory_info[extension]+=1
+                            else:
+                                directory_info[extension]=1
+                        #sort by key and return a dict
+                        directory_info=dict(sorted(directory_info.items(), key=lambda kv: kv[1],reverse=True))
+                        
+                        
+                            
+                            
+                        
+                        
+
+
+                        table=Table(title="file")
+                        table.add_column("extension")
+                        table.add_column("count")
+                        for key in directory_info:
+                            table.add_row(str(key),str(directory_info[key]))
+                        console.print(table)
+
+
+                        
+
+                        
+
+
+                    else:
+                        print("error directory not found")
+                else:
+                    print("error no directory in input")
+                    
+
+
+                    
+
             
             elif command[0]=="rdemail":
                 #by https://github.com/sameera-madushan/Mail-Swipe
                 #name Sameera Madushan
-                #thank you for create this awesome repository
+                #thank you for create this awesome repository 
                 API = 'https://www.1secmail.com/api/v1/'
                 domainList = ['1secmail.com', '1secmail.net', '1secmail.org']
                 domain = random.choice(domainList)
@@ -3364,6 +3445,21 @@ if __name__ == '__main__':
                 except KeyboardInterrupt:
                     deleteMail()
                 
+
+            elif command[0]=="getstatus":
+                while True:
+                    try:
+                        #get cpu,ram,disk usage
+                        cpu_usage=psutil.cpu_percent(interval=1)
+                        ram_usage=psutil.virtual_memory().percent
+                        disk_usage=psutil.disk_usage("/").percent
+                        print(f"cpu:{cpu_usage}% ram:{ram_usage}% disk:{disk_usage}%",end="\r")
+
+
+                        time.sleep(1)
+                    except KeyboardInterrupt:
+                        print("\nExiting...")
+                        break
                 
 
             elif command[0]=="neofetch":
@@ -3376,7 +3472,7 @@ if __name__ == '__main__':
                         )         (
                         (          )
                         ( (  )   (  ) )
-                    (__(__)___(__)__)\n
+                        (__(__)___(__)__)\n
                     system : {uname.system} {uname.version}\n
                     terminal version {version}\n
                     boot time {bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}\n
@@ -3444,5 +3540,6 @@ if __name__ == '__main__':
 
 
     #TODO
+    #add command to 
     
 
